@@ -206,154 +206,125 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function init() {
-        initEventListeners();
-        fetchData();
-        initHeroTrivia();
+    // 各ドロワーのセットアップ
+    setupDrawer('nav-timetable', 'timetable-drawer');
+    setupDrawer('nav-history', 'history-drawer');
+    setupDrawer('nav-theme', 'theme-drawer');
 
-        // 時間割の初期化
-        if (typeof Timetable !== 'undefined') {
-            Timetable.init();
-        }
+    // テーマカスタマイズ機能
+    function initThemeCustomization() {
+        const hero = document.getElementById('hero-section');
+        const colorGrid = document.getElementById('theme-color-grid');
+        const imageUpload = document.getElementById('theme-image-upload');
+        const resetBtn = document.getElementById('theme-reset');
+        if (!hero || !colorGrid) return;
 
-        // ToDoリストの初期化
-        if (typeof ToDo !== 'undefined') {
-            ToDo.init();
-        }
+        const presets = [
+            'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+            '#1e293b', '#dc2626', '#ea580c', '#ca8a04',
+            '#16a34a', '#0891b2', '#2563eb', '#9333ea', '#db2777',
+            'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
+            'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+            'linear-gradient(135deg, #e11d48 0%, #fb7185 100%)',
+            'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+            'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
+            'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+            '#171717', '#3f6212', '#1e40af', '#701a75'
+        ];
 
-        // ドロワー制御の汎用関数
-        function setupDrawer(navId, drawerId) {
-            const nav = document.getElementById(navId);
-            const drawer = document.getElementById(drawerId);
-            if (!nav || !drawer) return;
+        presets.forEach(color => {
+            const btn = document.createElement('button');
+            btn.className = 'size-8 rounded-full border-2 border-white shadow-sm hover:scale-110 transition-transform cursor-pointer';
+            btn.style.background = color;
+            btn.onclick = () => {
+                hero.style.backgroundImage = 'none';
+                hero.style.background = color;
+                localStorage.setItem('portal_theme', JSON.stringify({ type: 'color', value: color }));
+            };
+            colorGrid.appendChild(btn);
+        });
 
-            let isTransitioning = false;
+        imageUpload.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const dataUrl = event.target.result;
+                hero.style.background = 'none';
+                hero.style.backgroundImage = `url(${dataUrl})`;
+                hero.style.backgroundColor = 'black';
+                localStorage.setItem('portal_theme', JSON.stringify({ type: 'image', value: dataUrl }));
+            };
+            reader.readAsDataURL(file);
+        };
 
-            nav.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (isTransitioning) return;
+        resetBtn.onclick = () => {
+            hero.style.backgroundImage = 'none';
+            hero.style.background = presets[0];
+            localStorage.removeItem('portal_theme');
+        };
 
-                const isOpen = drawer.classList.contains('is-open');
-
-                if (!isOpen) {
-                    // 他のドロワーを閉じる（オプション）
-
-                    // 履歴ドロワーの場合、開く直前にデータをロード
-                    if (drawerId === 'history-drawer') {
-                        renderHistory();
-                    }
-
-                    isTransitioning = true;
-                    drawer.classList.add('is-open');
-                    const contentHeight = drawer.firstElementChild.scrollHeight;
-                    drawer.style.height = contentHeight + 'px';
-
-                    const handleTransitionEnd = () => {
-                        if (drawer.classList.contains('is-open')) {
-                            drawer.style.height = 'auto';
-                        }
-                        isTransitioning = false;
-                        drawer.removeEventListener('transitionend', handleTransitionEnd);
-                    };
-                    drawer.addEventListener('transitionend', handleTransitionEnd);
-                } else {
-                    isTransitioning = true;
-                    const contentHeight = drawer.firstElementChild.scrollHeight;
-                    drawer.style.height = contentHeight + 'px';
-                    drawer.offsetHeight;
-                    drawer.classList.remove('is-open');
-                    drawer.style.height = '0px';
-
-                    const handleTransitionEnd = () => {
-                        isTransitioning = false;
-                        drawer.removeEventListener('transitionend', handleTransitionEnd);
-                    };
-                    drawer.addEventListener('transitionend', handleTransitionEnd);
-                }
-            });
-
-            const resizeObserver = new ResizeObserver(() => {
-                if (drawer.classList.contains('is-open') && drawer.style.height !== '0px' && drawer.style.height !== 'auto' && !isTransitioning) {
-                    const contentHeight = drawer.firstElementChild.scrollHeight;
-                    drawer.style.height = contentHeight + 'px';
-                }
-            });
-            resizeObserver.observe(drawer.firstElementChild);
-        }
-
-        // リアクション履歴の描画
-        function renderHistory() {
-            const container = document.getElementById('history-content');
-            if (!container) return;
-
-            const history = JSON.parse(localStorage.getItem('lesson_submissions') || '[]');
-
-            if (history.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full py-20 text-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400">
-                        <span class="material-symbols-outlined text-4xl mb-2">history</span>
-                        <p>提出済みのリアクションシートはまだありません。</p>
-                    </div>
-                `;
-                return;
+        const savedTheme = JSON.parse(localStorage.getItem('portal_theme'));
+        if (savedTheme) {
+            if (savedTheme.type === 'color') hero.style.background = savedTheme.value;
+            else if (savedTheme.type === 'image') {
+                hero.style.backgroundImage = `url(${savedTheme.value})`;
+                hero.style.backgroundColor = 'black';
             }
-
-            container.innerHTML = history.map(item => Templates.historyCard(item)).join('');
-
-            const allHistory = JSON.parse(localStorage.getItem('lesson_submissions') || '[]');
-
-            // フィルタの選択肢を初期化（初回のみ）
-            if (monthFilter && monthFilter.options.length === 1) {
-                const months = [...new Set(allHistory.map(item => {
-                    const date = item.timestamp.split(' ')[0]; // yyyy-mm-dd
-                    return date.substring(0, 7); // yyyy-mm
-                }))].sort().reverse();
-
-                months.forEach(m => {
-                    const opt = document.createElement('option');
-                    opt.value = m;
-                    opt.textContent = m.replace('-', '年 ') + '月';
-                    monthFilter.appendChild(opt);
-                });
-
-                // イベントリスナー登録
-                monthFilter.addEventListener('change', renderHistory);
-                searchInput.addEventListener('input', renderHistory);
-            }
-
-            const activeMonth = monthFilter ? monthFilter.value : 'all';
-            const searchQuery = searchInput ? searchInput.value.toLowerCase() : '';
-
-            const filteredHistory = allHistory.filter(item => {
-                const date = item.timestamp.split(' ')[0];
-                const month = date.substring(0, 7);
-                const matchesMonth = activeMonth === 'all' || month === activeMonth;
-                const matchesSearch = item.lesson.toLowerCase().includes(searchQuery) ||
-                    item.summary.toLowerCase().includes(searchQuery);
-                return matchesMonth && matchesSearch;
-            });
-
-            if (filteredHistory.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full py-12 text-center bg-white/50 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400">
-                        <span class="material-symbols-outlined text-4xl mb-2">search_off</span>
-                        <p class="text-sm font-medium">該当する履歴が見つかりませんでした。</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // lessonUrl の紐付け（allLessons から検索）
-            container.innerHTML = filteredHistory.map(item => {
-                const lesson = state.allLessons.find(l => {
-                    // 授業名が一致するか、日付と科目が含まれるか（柔軟なマッチング）
-                    return l.title.includes(item.lesson) || item.lesson.includes(l.title);
-                });
-                const url = lesson ? lesson.url : '#';
-                return Templates.historyCard(item, url);
-            }).join('');
         }
     }
+
+    // リアクション履歴の描画とフィルタリング
+    function renderHistory() {
+        const container = document.getElementById('history-content');
+        const monthFilter = document.getElementById('history-month-filter');
+        const searchInput = document.getElementById('history-search');
+        if (!container) return;
+
+        const allHistory = JSON.parse(localStorage.getItem('lesson_submissions') || '[]');
+
+        if (monthFilter && monthFilter.options.length === 1 && allHistory.length > 0) {
+            const months = [...new Set(allHistory.map(item => {
+                const date = item.timestamp.split(' ')[0];
+                return date.substring(0, 7);
+            }))].sort().reverse();
+
+            months.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.textContent = m.replace('-', '年 ') + '月';
+                monthFilter.appendChild(opt);
+            });
+
+            monthFilter.addEventListener('change', renderHistory);
+            searchInput.addEventListener('input', renderHistory);
+        }
+
+        const activeMonth = monthFilter ? monthFilter.value : 'all';
+        const searchQuery = searchInput ? searchInput.value.toLowerCase() : '';
+
+        const filteredHistory = allHistory.filter(item => {
+            const date = item.timestamp.split(' ')[0];
+            const month = date.substring(0, 7);
+            const matchesMonth = activeMonth === 'all' || month === activeMonth;
+            const matchesSearch = item.lesson.toLowerCase().includes(searchQuery) ||
+                item.summary.toLowerCase().includes(searchQuery);
+            return matchesMonth && matchesSearch;
+        });
+
+        if (filteredHistory.length === 0) {
+            container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400">履歴が見つかりませんでした。</div>`;
+            return;
+        }
+
+        container.innerHTML = filteredHistory.map(item => {
+            const lesson = state.allLessons.find(l => l.title.includes(item.lesson) || item.lesson.includes(l.title));
+            return Templates.historyCard(item, lesson ? lesson.url : '#');
+        }).join('');
+    }
+
+    initThemeCustomization();
+}
 
     init();
 });
