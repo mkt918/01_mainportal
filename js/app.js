@@ -299,18 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             container.innerHTML = history.map(item => Templates.historyCard(item)).join('');
-        }
-
-        // 各ドロワーのセットアップ
-        setupDrawer('nav-timetable', 'timetable-drawer');
-        setupDrawer('nav-history', 'history-drawer');
-
-        // リアクション履歴の描画とフィルタリング
-        function renderHistory() {
-            const container = document.getElementById('history-content');
-            const monthFilter = document.getElementById('history-month-filter');
-            const searchInput = document.getElementById('history-search');
-            if (!container) return;
 
             const allHistory = JSON.parse(localStorage.getItem('lesson_submissions') || '[]');
 

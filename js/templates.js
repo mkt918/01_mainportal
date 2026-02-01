@@ -66,32 +66,37 @@ const Templates = {
     },
 
     /**
-     * 授業カードのHTMLを生成 (グリッド表示・コンパクト版)
+     * 授業カードのHTMLを生成 (ツールカード風デザイン)
      * @param {Object} lesson - 授業データ
      * @returns {string} HTML文字列
      */
     lessonCard(lesson) {
         const tagsHtml = lesson.tags
-            .map(tag => `<span class="text-[10px] text-slate-400 font-medium">#${this.escapeHtml(tag)}</span>`)
-            .join(' ');
+            .map(tag => `<span class="text-[10px] px-2 py-1 bg-primary/10 text-primary rounded border border-primary/20 font-medium">${this.escapeHtml(tag).toUpperCase()}</span>`)
+            .join('');
+
+        // アイコン（日付から連想されるものか、デフォルト）
+        const icon = 'import_contacts';
 
         return `
-            <div class="flex flex-col bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group lesson-item" data-tags="${this.escapeHtml(lesson.tags.join(','))}">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-1.5 text-primary text-[10px] font-bold">
-                        <span class="material-symbols-outlined text-sm">calendar_month</span> ${this.escapeHtml(lesson.date)}
+            <div class="group relative flex flex-col overflow-hidden rounded-xl bg-white border border-slate-200 neon-glow transition-all duration-300 shadow-sm lesson-item" data-tags="${this.escapeHtml(lesson.tags.join(','))}">
+                <div class="aspect-video bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center relative overflow-hidden">
+                    <span class="material-symbols-outlined text-4xl text-primary/30 group-hover:scale-110 transition-transform duration-500">${icon}</span>
+                    <div class="absolute bottom-2 left-3 flex items-center gap-1.5 text-primary text-[10px] font-bold bg-white/90 px-2 py-1 rounded-md shadow-sm">
+                        <span class="material-symbols-outlined text-xs">calendar_month</span> ${this.escapeHtml(lesson.date)}
                     </div>
-                    <span class="text-slate-400 text-[9px] bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100 font-bold uppercase tracking-wider">${this.escapeHtml(lesson.unit)}</span>
+                    <div class="absolute bottom-2 right-3 text-slate-500 text-[9px] bg-slate-100/90 px-2 py-1 rounded-md border border-slate-100 font-bold uppercase tracking-wider">
+                        ${this.escapeHtml(lesson.unit)}
+                    </div>
                 </div>
-                
-                <h4 class="text-slate-800 text-sm font-bold mb-3 leading-snug line-clamp-2 min-h-[2.5rem]">
-                    ${this.escapeHtml(lesson.title)}
-                </h4>
-                
-                <div class="mt-auto pt-3 border-t border-slate-50 flex items-center justify-between">
-                    <div class="flex flex-wrap gap-x-2 gap-y-1">${tagsHtml}</div>
-                    <a class="text-primary hover:text-primary-dark transition-colors" href="${this.escapeHtml(lesson.url)}" title="${CONFIG.labels.viewMaterial}">
-                        <span class="material-symbols-outlined text-lg">open_in_new</span>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="text-slate-800 text-lg font-bold line-clamp-1">${this.escapeHtml(lesson.title)}</h3>
+                    </div>
+                    <p class="text-slate-500 text-sm mb-4 line-clamp-2 min-h-[2.5rem] leading-relaxed">${this.escapeHtml(lesson.summary)}</p>
+                    <div class="flex flex-wrap gap-2 mb-4">${tagsHtml}</div>
+                    <a href="${this.escapeHtml(lesson.url)}" class="text-primary text-sm font-semibold flex items-center gap-1 hover:underline">
+                        詳細を見る <span class="material-symbols-outlined text-sm">arrow_forward</span>
                     </a>
                 </div>
             </div>
