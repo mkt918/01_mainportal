@@ -136,7 +136,7 @@
                     <!-- 左側: 時間割グリッド (レスポンシブ対応) -->
                     <div class="w-full xl:flex-1 overflow-hidden">
                         <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
-                            <div class="min-w-[800px]">
+                            <div class="min-w-[500px]">
                                 <table id="timetable-grid" class="w-full border-collapse bg-white">
                                     <!-- js/timetable.js によって動的に生成されます -->
                                 </table>
@@ -196,123 +196,126 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <main class="flex flex-1 flex-col items-center">
+        <!-- ========================================
+             メインコンテンツ
+             ======================================== -->
+        <main class="flex flex-1 flex-col items-center">
 
-                    <!-- ========================================
+            <!-- ========================================
                  ヒーローセクション
                  ======================================== -->
-                    <section class="w-full max-w-[1200px] px-4 md:px-10 py-12 md:py-20" aria-labelledby="hero-title">
-                        <div
-                            class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-indigo-600 p-8 md:p-16 flex flex-col items-center text-center gap-8 shadow-xl">
-                            <div class="absolute inset-0 opacity-30 pointer-events-none"
-                                style="background-image: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.3) 0%, transparent 50%);">
-                            </div>
-                            <div class="flex flex-col gap-4 z-10">
-                                <span class="text-blue-100 font-mono text-sm tracking-widest uppercase">探究と創造の場</span>
-                                <h1 id="hero-title"
-                                    class="text-white text-5xl md:text-7xl font-black leading-tight tracking-[-0.033em]">
-                                    学びを、もっと <span class="text-yellow-300">クリエイティブ</span> に。
-                                </h1>
-                                <p class="text-blue-100 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-                                    このサイトは授業の資料、便利な学習ツール、過去の授業記録をまとめたクラス専用ポータルです。
-                                </p>
-                            </div>
-                            <div class="flex flex-wrap gap-4 justify-center z-10">
-                                <a href="#tools-section"
-                                    class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-white text-primary text-base font-bold transition-transform hover:scale-105 shadow-lg">
-                                    ツールを使う
-                                </a>
-                                <a href="#lessons-section"
-                                    class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-white/20 text-white text-base font-bold border border-white/30 hover:bg-white/30 transition-colors">
-                                    授業記録を見る
-                                </a>
-                            </div>
-                        </div>
-                    </section>
+            <section class="w-full max-w-[1200px] px-4 md:px-10 py-12 md:py-20" aria-labelledby="hero-title">
+                <div
+                    class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-indigo-600 p-8 md:p-16 flex flex-col items-center text-center gap-8 shadow-xl">
+                    <div class="absolute inset-0 opacity-30 pointer-events-none"
+                        style="background-image: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.3) 0%, transparent 50%);">
+                    </div>
+                    <div class="flex flex-col gap-4 z-10">
+                        <span class="text-blue-100 font-mono text-sm tracking-widest uppercase">今日の雑学</span>
+                        <h1 id="hero-title"
+                            class="text-white text-5xl md:text-7xl font-black leading-tight tracking-[-0.033em]">
+                            学びを、もっと <span class="text-yellow-300">クリエイティブ</span> に。
+                        </h1>
+                        <p class="text-blue-100 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                            このサイトは授業の資料、便利な学習ツール、過去の授業記録をまとめたクラス専用ポータルです。
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-4 justify-center z-10">
+                        <a href="#tools-section"
+                            class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-white text-primary text-base font-bold transition-transform hover:scale-105 shadow-lg">
+                            ツールを使う
+                        </a>
+                        <a href="#lessons-section"
+                            class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-white/20 text-white text-base font-bold border border-white/30 hover:bg-white/30 transition-colors">
+                            授業記録を見る
+                        </a>
+                    </div>
+                </div>
+            </section>
 
-                    <!-- ========================================
+            <!-- ========================================
                  学習ツールセクション
                  ======================================== -->
-                    <section id="tools-section" class="w-full max-w-[1200px] px-10 py-10" aria-labelledby="tools-title">
-                        <div class="flex items-center justify-between mb-8">
-                            <div>
-                                <h2 id="tools-title" class="text-slate-800 text-3xl font-bold tracking-tight">授業で活用するツール
-                                </h2>
-                                <p class="text-slate-500 text-sm mt-1">学習を効率化するWebアプリをセレクトしました。</p>
-                            </div>
-                        </div>
-                        <div id="tools-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <!-- js/app.js によって動的に挿入されます -->
-                        </div>
-                    </section>
+            <section id="tools-section" class="w-full max-w-[1200px] px-10 py-10" aria-labelledby="tools-title">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 id="tools-title" class="text-slate-800 text-3xl font-bold tracking-tight">授業で活用するツール
+                        </h2>
+                        <p class="text-slate-500 text-sm mt-1">学習を効率化するWebアプリをセレクトしました。</p>
+                    </div>
+                </div>
+                <div id="tools-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- js/app.js によって動的に挿入されます -->
+                </div>
+            </section>
 
-                    <!-- ========================================
+            <!-- ========================================
                  授業記録セクション
                  ======================================== -->
-                    <section id="lessons-section" class="w-full max-w-[1200px] px-10 py-20"
-                        aria-labelledby="lessons-title">
-                        <div class="mb-12 text-center">
-                            <h2 id="lessons-title" class="text-slate-800 text-4xl font-bold tracking-tight mb-2">授業の記録
-                            </h2>
-                            <p class="text-slate-500 mb-8">これまでの授業内容を日付や単元で振り返ることができます。</p>
+            <section id="lessons-section" class="w-full max-w-[1200px] px-10 py-20" aria-labelledby="lessons-title">
+                <div class="mb-12 text-center">
+                    <h2 id="lessons-title" class="text-slate-800 text-4xl font-bold tracking-tight mb-2">授業の記録
+                    </h2>
+                    <p class="text-slate-500 mb-8">これまでの授業内容を日付や単元で振り返ることができます。</p>
 
-                            <!-- フィルタUI -->
-                            <div class="max-w-2xl mx-auto flex flex-col gap-4">
-                                <div class="relative">
-                                    <span
-                                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                                    <input id="lesson-search" type="text" placeholder="キーワード（単元名、内容など）で検索..."
-                                        class="w-full bg-white border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-slate-800 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
-                                        aria-label="授業記録を検索">
-                                </div>
-                                <div id="tag-filters" class="flex flex-wrap justify-center gap-2" role="group"
-                                    aria-label="タグフィルター">
-                                    <!-- js/app.js によって動的に挿入されます -->
-                                </div>
-                            </div>
+                    <!-- フィルタUI -->
+                    <div class="max-w-2xl mx-auto flex flex-col gap-4">
+                        <div class="relative">
+                            <span
+                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                            <input id="lesson-search" type="text" placeholder="キーワード（単元名、内容など）で検索..."
+                                class="w-full bg-white border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-slate-800 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+                                aria-label="授業記録を検索">
                         </div>
-
-                        <div class="relative max-w-3xl mx-auto">
-                            <!-- 垂直タイムライン -->
-                            <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary/50 via-primary/20 to-transparent transform md:-translate-x-1/2 hidden sm:block"
-                                aria-hidden="true"></div>
-                            <div id="lessons-container" class="space-y-12">
-                                <!-- js/app.js によって動的に挿入されます -->
-                            </div>
-                        </div>
-                    </section>
-
-                </main>
-
-                <!-- ========================================
-             フッター
-             ======================================== -->
-                <footer class="border-t border-slate-200 bg-slate-50 py-12 px-10 md:px-40">
-                    <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center gap-3 text-slate-800">
-                                <span class="material-symbols-outlined text-primary">school</span>
-                                <span class="font-bold text-xl uppercase tracking-tighter">Class Portal</span>
-                            </div>
-                            <p class="text-slate-500 text-sm">© 2024 教育ポータルサイト。学びを未来へ繋ぐ。</p>
-                        </div>
-                        <div
-                            class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200">
-                            <div class="size-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></div>
-                            <span class="text-emerald-600 text-xs font-bold">現在の状態: 公開中</span>
+                        <div id="tag-filters" class="flex flex-wrap justify-center gap-2" role="group"
+                            aria-label="タグフィルター">
+                            <!-- js/app.js によって動的に挿入されます -->
                         </div>
                     </div>
-                </footer>
+                </div>
 
+                <div class="relative max-w-3xl mx-auto">
+                    <!-- 垂直タイムライン -->
+                    <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary/50 via-primary/20 to-transparent transform md:-translate-x-1/2 hidden sm:block"
+                        aria-hidden="true"></div>
+                    <div id="lessons-container" class="space-y-12">
+                        <!-- js/app.js によって動的に挿入されます -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ========================================
+             フッター
+             ======================================== -->
+        <footer class="border-t border-slate-200 bg-slate-50 py-12 px-10 md:px-40">
+            <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center gap-3 text-slate-800">
+                        <span class="material-symbols-outlined text-primary">school</span>
+                        <span class="font-bold text-xl uppercase tracking-tighter">Class Portal</span>
+                    </div>
+                    <p class="text-slate-500 text-sm">© 2024 教育ポータルサイト。学びを未来へ繋ぐ。</p>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200">
+                    <div class="size-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></div>
+                    <span class="text-emerald-600 text-xs font-bold">現在の状態: 公開中</span>
+                </div>
             </div>
+        </footer>
 
-            <!-- Scripts (順序が重要: config → templates → timetable → todo → app) -->
-            <script src="js/config.js"></script>
-            <script src="js/templates.js"></script>
-            <script src="js/timetable.js"></script>
-            <script src="js/todo.js"></script>
-            <script src="js/app.js"></script>
+    </div>
+
+    <!-- Scripts (順序が重要: config → templates → timetable → todo → app) -->
+    <script src="js/config.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/timetable.js"></script>
+    <script src="js/todo.js"></script>
+    <script src="js/app.js"></script>
 </body>
 
 </html>

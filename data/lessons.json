@@ -1,41 +1,52 @@
 [
   {
-    "id": 1,
-    "date": "2024-02-01",
-    "unit": "イントロダクション",
-    "title": "ポータルサイトの使い方と授業の進め方",
-    "summary": "このポータルサイトの活用方法と、これからの授業の進め方について解説します。",
-    "tags": [
-      "授業案内",
-      "Web"
-    ],
-    "readTime": "5分",
-    "url": "note/2024-02-01/index.html"
-  },
-  {
     "id": 2,
-    "date": "2024-01-25",
-    "unit": "プログラミング基礎",
-    "title": "JavaScriptの基本構文を学ぼう",
-    "summary": "変数、関数、ループなど、JavaScriptの基礎的な概念を実践的に学びます。",
+    "date": "2026-02-01T00:00:00.000Z",
+    "unit": "変数とデータ型の基礎",
+    "title": "プログラミング（5限）",
+    "summary": "変数とデータ型の基礎について学習しました。",
     "tags": [
-      "JavaScript",
-      "基礎"
+      "プログラミング",
+      "5限"
     ],
-    "readTime": "15分",
-    "url": "note/2024-01-25/index.html"
+    "readTime": "10分",
+    "url": "note/2026-02-01-プログラミング/index.html"
   },
   {
     "id": 3,
-    "date": "2024-01-18",
-    "unit": "デザイン",
-    "title": "使いやすいUIデザインの原則",
-    "summary": "色彩、配置、タイポグラフィなど、ユーザーが迷わないデザインの基本について学びます。",
+    "date": "2026-02-01T00:00:00.000Z",
+    "unit": "貸借対照表と損益計算書の基本",
+    "title": "簿記（2限）",
+    "summary": "貸借対照表と損益計算書の基本について学習しました。",
     "tags": [
-      "UI/UX",
-      "デザイン"
+      "簿記",
+      "2限"
     ],
     "readTime": "10分",
-    "url": "note/2024-01-18/index.html"
+    "url": "note/2026-02-01-簿記/index.html"
+  },
+  {
+    "id": 1,
+    "date": "2024-02-05T00:00:00.000Z",
+    "unit": "仕訳の基本",
+    "title": "簿記（1限）",
+    "summary": "仕訳の基本について学習しました。",
+    "tags": [
+      "簿記",
+      "1限"
+    ],
+    "readTime": "10分",
+    "url": "note/2024-02-05-簿記/index.html"
+  },
+  {
+    "id": 4,
+    "title": "undefined（undefined限）",
+    "summary": "undefinedについて学習しました。",
+    "tags": [
+      null,
+      "undefined限"
+    ],
+    "readTime": "10分",
+    "url": "note/README/index.html"
   }
 ]

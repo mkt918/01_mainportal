@@ -83,8 +83,8 @@ const Timetable = {
         let html = `
             <thead>
                 <tr class="bg-slate-50 border-b border-slate-200">
-                    <th class="p-3 text-xs font-bold text-slate-400 border-r border-slate-200 w-16 text-center">時限</th>
-                    ${days.map(day => `<th class="p-3 text-sm font-bold text-slate-700 text-center">${day}曜日</th>`).join('')}
+                    <th class="p-1 text-[10px] font-bold text-slate-400 border-r border-slate-200 w-8 text-center">時限</th>
+                    ${days.map(day => `<th class="p-1 text-xs font-bold text-slate-700 text-center">${day}</th>`).join('')}
                 </tr>
             </thead>
             <tbody>
@@ -92,9 +92,9 @@ const Timetable = {
 
         for (let period = 0; period < 6; period++) {
             html += `
-                <tr class="border-b border-slate-100 last:border-0 h-28">
-                    <td class="p-3 text-center border-r border-slate-200 bg-slate-50/50">
-                        <span class="text-sm font-bold text-slate-400">${period + 1}</span>
+                <tr class="border-b border-slate-100 last:border-0 h-12">
+                    <td class="p-1 text-center border-r border-slate-200 bg-slate-50/50">
+                        <span class="text-xs font-bold text-slate-400">${period + 1}</span>
                     </td>
                     ${[0, 1, 2, 3, 4].map(day => {
                 const { subject, teacher, color } = this.state.data[period][day];
@@ -104,9 +104,9 @@ const Timetable = {
                             <td class="p-0 border-r border-slate-100 last:border-0 transition-all timetable-cell cursor-pointer hover:brightness-95" 
                                 data-period="${period}" data-day="${day}"
                                 style="background-color: ${bgColor};">
-                                <div class="w-full h-full flex flex-col items-center justify-center p-4 text-center">
-                                    <span class="text-sm font-bold text-slate-800 leading-tight">${Templates.escapeHtml(subject)}</span>
-                                    ${teacher ? `<span class="text-[10px] text-slate-500 mt-1 font-medium">${Templates.escapeHtml(teacher)}</span>` : ''}
+                                <div class="w-full h-full flex flex-col items-center justify-center p-1 text-center">
+                                    <span class="text-[10px] font-bold text-slate-800 leading-tight line-clamp-2">${Templates.escapeHtml(subject)}</span>
+                                    ${teacher ? `<span class="text-[8px] text-slate-500 mt-0.5 font-medium line-clamp-1">${Templates.escapeHtml(teacher)}</span>` : ''}
                                 </div>
                             </td>
                         `;

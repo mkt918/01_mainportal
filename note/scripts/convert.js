@@ -1,0 +1,1014 @@
+const fs = require('fs');
+const path = require('path');
+const matter = require('gray-matter');
+const { marked } = require('marked');
+
+/**
+ * Markdown授業記録をHTMLに変換し、lessons.jsonを更新するスクリプト
+ */
+
+const LESSONS_DIR = path.join(__dirname, '../lessons');
+const OUTPUT_DIR = path.join(__dirname, '../../note');
+const DATA_DIR = path.join(__dirname, '../../data');
+const LESSONS_JSON = path.join(DATA_DIR, 'lessons.json');
+
+/**
+ * Markdownファイルを読み込んでパース
+ */
+function parseMarkdownFile(filePath) {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const { data, content: markdown } = matter(content);
+
+    return {
+        frontmatter: data,
+        markdown: markdown,
+        filename: path.basename(filePath, '.md')
+    };
+}
+
+/**
+ * クイズをインタラクティブなHTMLに変換（新UI対応）
+ */
+function convertQuizToHTML(markdown) {
+    // クイズ部分を検出して変換
+    let quizCounter = 0;
+    // Windows改行コード(\r\n)に対応
+    const quizRegex = /\*\*Q(\d+)\*\*:\s*(.+?)[\r\n]+[\r\n]+((?:- [A-C]\).+?[\r\n]+)+)/gm;
+
+    return markdown.replace(quizRegex, (match, qNum, question, options) => {
+        const questionId = `quiz-${quizCounter++}`;
+        const optionLines = options.trim().split(/[\r\n]+/).filter(line => line.trim());
+        const optionsHTML = optionLines.map((line, idx) => {
+            const isCorrect = line.includes('✓');
+            const cleanLine = line.replace('✓', '').trim();
+            const letter = cleanLine.match(/- ([A-C])\)/)[1];
+            const text = cleanLine.replace(/- [A-C]\)\s*/, '');
+
+            // インデントなしで生成（markedがコードブロックとして解釈しないように）
+            // クリック時に即座に答え合わせ
+            return `<div class="quiz-option" data-correct="${isCorrect}" onclick="checkAnswerImmediately('${questionId}', this)"><span class="option-letter">${letter}</span><span class="option-text">${text}</span></div>`;
+        }).join('');
+
+        // インデントなしで生成（答え合わせボタンは削除）
+        return `<div class="quiz-question section-card" data-quiz-id="${questionId}"><p class="question-text text-lg font-semibold mb-4"><strong>Q${qNum}</strong>: ${question}</p><div class="quiz-options">${optionsHTML}</div><div class="quiz-feedback"></div></div>`;
+    });
+}
+
+/**
+ * 資料セクションをアコーディオン形式に変換
+ */
+function convertMaterialsToAccordion(htmlContent) {
+    // 資料セクションを検出
+    const materialsRegex = /<h2>📎 資料<\/h2>\s*<ul>([\s\S]*?)<\/ul>/g;
+
+    return htmlContent.replace(materialsRegex, (match, listContent) => {
+        // リンクを抽出してPDF埋め込みに変換
+        const linkRegex = /<li><a href="([^"]+)">([^<]+)<\/a><\/li>/g;
+        const materials = [];
+        let linkMatch;
+
+        while ((linkMatch = linkRegex.exec(listContent)) !== null) {
+            const url = linkMatch[1];
+            const title = linkMatch[2];
+            const isPDF = url.toLowerCase().endsWith('.pdf') || url.includes('drive.google.com');
+
+            if (isPDF) {
+                // PDF埋め込み
+                const embedUrl = url.includes('drive.google.com')
+                    ? url.replace('/view', '/preview')
+                    : `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+
+                materials.push(`
+                    <div class="mb-4">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-indigo-600">picture_as_pdf</span>
+                                <span class="font-semibold">${title}</span>
+                            </div>
+                            <span class="material-symbols-outlined accordion-icon text-slate-400">expand_more</span>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="p-4 bg-white rounded-lg">
+                                <iframe src="${embedUrl}" class="pdf-viewer"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            } else {
+                // 通常のリンク
+                materials.push(`
+                    <div class="mb-4">
+                        <a href="${url}" target="_blank" class="accordion-header block hover:no-underline">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-indigo-600">link</span>
+                                <span class="font-semibold">${title}</span>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-400">open_in_new</span>
+                        </a>
+                    </div>
+                `);
+            }
+        }
+
+        return `
+            <div class="section-card">
+                <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-indigo-600">folder_open</span>
+                    資料
+                </h2>
+                ${materials.join('')}
+            </div>
+        `;
+    });
+}
+
+/**
+ * HTMLコンテンツをタブ形式に変換
+ */
+function convertToTabStructure(htmlContent) {
+    const sections = [];
+
+    // 1. 各セクションの抽出
+
+    // 前回の復習
+    const reviewMatch = htmlContent.match(/<h2>📚 前回の復習<\/h2>([\s\S]*?)(?=<h2>|<div class="section-card">|$)/);
+    let reviewText = reviewMatch ? reviewMatch[1] : '';
+    // 復習セクションからクイズ部分を分離
+    const reviewQuizPart = reviewText.match(/<h3>復習クイズ<\/h3>([\s\S]*?)$/);
+    const reviewContentText = reviewText.replace(/<h3>復習クイズ<\/h3>[\s\S]*$/, '').trim();
+
+    // 本日の内容
+    const scheduleMatch = htmlContent.match(/<h2>📅 (?:本日の予定|本日の内容)<\/h2>([\s\S]*?)(?=<h2>|<div class="section-card">|$)/);
+    const scheduleContentText = scheduleMatch ? scheduleMatch[1].trim() : '';
+
+    // 資料セクション（カード全体を抽出）
+    const materialsMatch = htmlContent.match(/<div class="section-card">[\s\S]*?<h2[^>]*>[\s\S]*?folder_open[\s\S]*?資料[\s\S]*?<\/h2>[\s\S]*?<\/div>\s*<\/div>/)
+        || htmlContent.match(/<div class="section-card">[\s\S]*?<h2[^>]*>[\s\S]*?folder_open[\s\S]*?資料[\s\S]*?<\/h2>[\s\S]*?<\/div>/);
+    const materialsContentText = materialsMatch ? materialsMatch[0] : '';
+
+    // まとめクイズ
+    const summaryMatch = htmlContent.match(/<h2>✅ まとめクイズ<\/h2>([\s\S]*?)(?=<h2>|<div class="section-card">|$)/);
+    const summaryText = summaryMatch ? summaryMatch[1] : '';
+
+    // 2. クイズの抽出
+    const quizRegex = /<div class="quiz-question section-card"[^>]*>[\s\S]*?<div class="quiz-feedback"><\/div><\/div>/g;
+
+    // 復習クイズの抽出
+    const reviewQuizzes = reviewQuizPart ? (reviewQuizPart[1].match(quizRegex) || []) : [];
+
+    // まとめクイズの抽出
+    const summaryQuizzes = summaryText.match(quizRegex) || [];
+
+    // 3. タブセクションの構築
+
+    // Tab 1: 復習クイズ
+    if (reviewQuizzes.length > 0) {
+        const carouselItems = reviewQuizzes.map((quizHTML, index) =>
+            `<div class="carousel-item ${index === 0 ? 'active' : ''}">${quizHTML}</div>`
+        ).join('');
+
+        sections.push({
+            id: 'review-quizzes',
+            title: '📝 復習クイズ',
+            isQuiz: true,
+            content: `
+                <div class="quiz-carousel" data-carousel="review">
+                    <div class="carousel-container">${carouselItems}</div>
+                    ${reviewQuizzes.length > 1 ? `
+                    <div class="carousel-nav">
+                        <button class="carousel-btn prev" onclick="navigateCarousel('review', -1)"><span class="material-symbols-outlined">chevron_left</span></button>
+                        <span class="carousel-indicator"><span class="current-slide">1</span> / ${reviewQuizzes.length}</span>
+                        <button class="carousel-btn next" onclick="navigateCarousel('review', 1)"><span class="material-symbols-outlined">chevron_right</span></button>
+                    </div>` : ''}
+                </div>`
+        });
+    }
+
+    // Tab 2: 本日の内容
+    if (reviewContentText || scheduleContentText || materialsContentText) {
+        sections.push({
+            id: 'schedule',
+            title: '📅 本日の内容',
+            content: `
+                ${reviewContentText ? `<div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">history</span>前回のおさらい</h3><div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">${reviewContentText}</div></div>` : ''}
+                ${scheduleContentText ? `<div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">event_note</span>今日の予定</h3>${scheduleContentText}</div>` : ''}
+                ${materialsContentText ? `<div class="mb-4">${materialsContentText}</div>` : ''}
+            `
+        });
+    }
+
+    // Tab 3: まとめクイズ
+    if (summaryQuizzes.length > 0) {
+        const carouselItems = summaryQuizzes.map((quizHTML, index) =>
+            `<div class="carousel-item ${index === 0 ? 'active' : ''}">${quizHTML}</div>`
+        ).join('');
+
+        sections.push({
+            id: 'summary-quizzes',
+            title: '📋 まとめクイズ',
+            isQuiz: true,
+            content: `
+                <div class="quiz-carousel" data-carousel="summary">
+                    <div class="carousel-container">${carouselItems}</div>
+                    ${summaryQuizzes.length > 1 ? `
+                    <div class="carousel-nav">
+                        <button class="carousel-btn prev" onclick="navigateCarousel('summary', -1)"><span class="material-symbols-outlined">chevron_left</span></button>
+                        <span class="carousel-indicator"><span class="current-slide">1</span> / ${summaryQuizzes.length}</span>
+                        <button class="carousel-btn next" onclick="navigateCarousel('summary', 1)"><span class="material-symbols-outlined">chevron_right</span></button>
+                    </div>` : ''}
+                </div>`
+        });
+    }
+
+    // Tab 4: リアクションシート
+    sections.push({
+        id: 'reaction-sheet',
+        title: '📝 リアクションシート',
+        content: `
+            <div class="section-card">
+                <h3 class="text-xl font-bold mb-6 text-indigo-600 flex items-center gap-2">
+                    <span class="material-symbols-outlined">send</span>
+                    リアクションシート
+                </h3>
+                <form id="reactionForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">4桁番号（半角数字）</label>
+                            <input type="text" id="userNumber" name="number" required pattern="\\d{4}" maxlength="4" 
+                                class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-colors"
+                                placeholder="例: 1234">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">授業名</label>
+                            <input type="text" id="lessonTitle" name="lesson" readonly 
+                                class="w-full px-4 py-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-500 outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">まとめ・感想</label>
+                        <textarea id="summary" name="summary" required rows="4"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-colors"
+                            placeholder="今日学んだこと、印象に残ったこと"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">わからなかったところ</label>
+                        <textarea id="questions" name="questions" rows="3"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-colors"
+                            placeholder="疑問点やもっと詳しく知りたいことがあれば記入してください"></textarea>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 active:translate-y-0 disabled:opacity-50">
+                            この内容で送信する
+                        </button>
+                        <div id="formStatus" class="hidden text-center p-3 rounded-lg font-medium"></div>
+                    </div>
+                </form>
+
+                <div class="mt-12 pt-8 border-t border-slate-100">
+                    <h4 class="text-sm font-bold text-slate-500 mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">history</span>
+                        送信履歴（ローカル保存）
+                    </h4>
+                    <div id="submissionHistory" class="space-y-4">
+                        <!-- 履歴がここに表示されます -->
+                    </div>
+                </div>
+            </div>
+        `
+    });
+
+    if (sections.length === 0) return htmlContent;
+
+    // 4. HTMLの生成
+    const tabButtons = sections.map(s =>
+        `<button class="tab-button" data-tab="${s.id}" onclick="switchTab('${s.id}')">${s.title}</button>`
+    ).join('');
+
+    const tabContents = sections.map(s =>
+        `<div id="${s.id}" class="tab-content ${s.isQuiz ? 'tab-quiz-content' : ''}">${s.content}</div>`
+    ).join('');
+
+    // 元のコンテンツから抽出したセクションを完全に削除
+    let remainingContent = htmlContent;
+    if (reviewMatch) remainingContent = remainingContent.replace(reviewMatch[0], '');
+    if (scheduleMatch) remainingContent = remainingContent.replace(scheduleMatch[0], '');
+    if (summaryMatch) remainingContent = remainingContent.replace(summaryMatch[0], '');
+    if (materialsMatch) remainingContent = remainingContent.replace(materialsMatch[0], '');
+
+    // クイズ単体で残っているものを削除（タブに含まれなかった場合用）
+    remainingContent = remainingContent.replace(/<div class="quiz-question section-card"[^>]*>[\s\S]*?<div class="quiz-feedback"><\/div><\/div>/g, '');
+
+    return `
+<div class="tab-container">
+    <div class="tab-nav">${tabButtons}</div>
+    ${tabContents}
+</div>
+${remainingContent.trim()}`;
+}
+
+
+/**
+ * HTMLテンプレートを生成（モダンデザイン版）
+ */
+function generateHTML(data, htmlContent) {
+    return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${data.subject} - ${data.date}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+        }
+        
+        .quiz-option {
+            cursor: pointer;
+            padding: 16px 20px;
+            margin: 12px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .quiz-option:hover {
+            border-color: #6366f1;
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+        
+        .quiz-option.selected {
+            border-color: #6366f1;
+            background: #eef2ff;
+        }
+        
+        .quiz-option.correct {
+            border-color: #10b981;
+            background: #d1fae5;
+        }
+        
+        .quiz-option.incorrect {
+            border-color: #ef4444;
+            background: #fee2e2;
+        }
+        
+        .quiz-option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .option-letter {
+            font-weight: bold;
+            color: #6366f1;
+            min-width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eef2ff;
+            border-radius: 50%;
+            font-size: 14px;
+        }
+        
+        .quiz-option.correct .option-letter {
+            background: #d1fae5;
+            color: #10b981;
+        }
+        
+        .quiz-option.incorrect .option-letter {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+        
+        .check-answer-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        
+        .check-answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        .check-answer-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .quiz-feedback {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 15px;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .quiz-feedback.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .quiz-feedback.correct {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .quiz-feedback.incorrect {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .accordion-header {
+            cursor: pointer;
+            padding: 16px 20px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            margin-bottom: 8px;
+        }
+        
+        .accordion-header:hover {
+            border-color: #6366f1;
+            background: #f8fafc;
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .accordion-content.open {
+            max-height: 2000px;
+        }
+        
+        .accordion-icon {
+            transition: transform 0.3s;
+            font-size: 20px;
+        }
+        
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* カルーセルスタイル */
+        .quiz-carousel {
+            position: relative;
+            width: 100%;
+        }
+        
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .carousel-item {
+            display: none;
+            animation: fadeIn 0.4s ease-in;
+        }
+        
+        .carousel-item.active {
+            display: block;
+        }
+        
+        .carousel-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            margin-top: 32px;
+            padding: 16px;
+        }
+        
+        .carousel-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        
+        .carousel-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        .carousel-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .carousel-indicator {
+            font-weight: 600;
+            color: #64748b;
+            font-size: 16px;
+        }
+        
+        .carousel-indicator .current-slide {
+            color: #6366f1;
+            font-size: 20px;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .pdf-viewer {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        /* タブシステム */
+        .tab-container {
+            background: white;
+            border-radius: 16px;
+            padding: 0;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        
+        .tab-nav {
+            display: flex;
+            gap: 0;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+        
+        .tab-nav::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .tab-nav::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        
+        .tab-button {
+            padding: 16px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .tab-button:hover {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        .tab-button.active {
+            color: #6366f1;
+            border-bottom-color: #6366f1;
+            background: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 24px;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .tab-quiz-content {
+            min-height: 450px;
+        }
+
+        form textarea {
+            resize: none;
+        }
+
+        .history-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 0.9rem;
+        }
+
+        .history-date {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body class="font-sans p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <a href="../../index.html" class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium mb-6 transition-colors">
+            <span class="material-symbols-outlined text-xl">arrow_back</span>
+            ポータルに戻る
+        </a>
+        
+        <!-- ヘッダー -->
+        <div class="section-card mb-8">
+            <div class="flex items-center gap-3 text-slate-500 text-sm mb-3">
+                <span class="material-symbols-outlined text-lg">calendar_month</span>
+                <span>${data.date}</span>
+                <span class="mx-1">|</span>
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">${data.period}限</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">${data.subject}</h1>
+            <p class="text-xl text-slate-600">${data.unit}</p>
+        </div>
+
+        <!-- メインコンテンツ -->
+        <div class="prose prose-slate max-w-none">
+            ${htmlContent}
+        </div>
+    </div>
+
+    <script>
+        // クイズ管理
+        const quizState = {};
+        
+        function selectAnswer(questionId, optionElement) {
+            // 同じ問題の他の選択肢の選択を解除
+            const questionDiv = optionElement.closest('.quiz-question');
+            questionDiv.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // 選択状態を保存
+            optionElement.classList.add('selected');
+            quizState[questionId] = optionElement;
+            
+            // 答え合わせボタンを有効化
+            const checkBtn = questionDiv.querySelector('.check-answer-btn');
+            if (checkBtn) checkBtn.disabled = false;
+        }
+        
+        function checkAnswer(questionId) {
+            const selectedOption = quizState[questionId];
+            if (!selectedOption) return;
+            
+            const questionDiv = selectedOption.closest('.quiz-question');
+            const isCorrect = selectedOption.dataset.correct === 'true';
+            const feedback = questionDiv.querySelector('.quiz-feedback');
+            const checkBtn = questionDiv.querySelector('.check-answer-btn');
+            
+            // すべての選択肢を無効化
+            questionDiv.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.add('disabled');
+                if (opt.dataset.correct === 'true') {
+                    opt.classList.add('correct');
+                }
+            });
+            
+            // フィードバック表示
+            feedback.classList.add('show');
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+                feedback.classList.add('correct');
+                feedback.innerHTML = '<span class="material-symbols-outlined" style="vertical-align: middle;">check_circle</span> 正解です！よくできました。';
+            } else {
+                selectedOption.classList.add('incorrect');
+                feedback.classList.add('incorrect');
+                feedback.innerHTML = '<span class="material-symbols-outlined" style="vertical-align: middle;">cancel</span> 不正解です。正解を確認してください。';
+            }
+            
+            // ボタンを非表示
+            if (checkBtn) checkBtn.style.display = 'none';
+        }
+        
+        // 即座に答え合わせ（クリック時）
+        function checkAnswerImmediately(questionId, optionElement) {
+            const questionDiv = optionElement.closest('.quiz-question');
+            
+            // すでに答え合わせ済みの場合は何もしない
+            if (questionDiv.classList.contains('answered')) return;
+            
+            const isCorrect = optionElement.dataset.correct === 'true';
+            const feedback = questionDiv.querySelector('.quiz-feedback');
+            
+            // 答え合わせ済みマークを付ける
+            questionDiv.classList.add('answered');
+            
+            // すべての選択肢を無効化
+            questionDiv.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.add('disabled');
+                if (opt.dataset.correct === 'true') {
+                    opt.classList.add('correct');
+                }
+            });
+            
+            // フィードバック表示
+            feedback.classList.add('show');
+            if (isCorrect) {
+                optionElement.classList.add('correct');
+                feedback.classList.add('correct');
+                feedback.innerHTML = '<span class="material-symbols-outlined" style="vertical-align: middle;">check_circle</span> 正解です！よくできました。';
+            } else {
+                optionElement.classList.add('incorrect');
+                feedback.classList.add('incorrect');
+                feedback.innerHTML = '<span class="material-symbols-outlined" style="vertical-align: middle;">cancel</span> 不正解です。正解を確認してください。';
+            }
+        }
+        
+        // カルーセルナビゲーション
+        function navigateCarousel(carouselId, direction) {
+            const carousel = document.querySelector('[data-carousel="' + carouselId + '"]');
+            if (!carousel) return;
+            
+            const items = carousel.querySelectorAll('.carousel-item');
+            const currentIndex = Array.from(items).findIndex(item => item.classList.contains('active'));
+            const newIndex = currentIndex + direction;
+            
+            // 範囲チェック
+            if (newIndex < 0 || newIndex >= items.length) return;
+            
+            // アクティブアイテムを切り替え
+            items[currentIndex].classList.remove('active');
+            items[newIndex].classList.add('active');
+            
+            // インジケーターを更新
+            const indicator = carousel.querySelector('.current-slide');
+            if (indicator) {
+                indicator.textContent = newIndex + 1;
+            }
+            
+            // ボタンの有効/無効を更新
+            const prevBtn = carousel.querySelector('.carousel-btn.prev');
+            const nextBtn = carousel.querySelector('.carousel-btn.next');
+            if (prevBtn) prevBtn.disabled = newIndex === 0;
+            if (nextBtn) nextBtn.disabled = newIndex === items.length - 1;
+        }
+        
+        // タブ切り替え
+        function switchTab(tabId) {
+            // すべてのタブボタンとコンテンツを非アクティブに
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 選択されたタブをアクティブに
+            const selectedButton = document.querySelector('[data-tab="' + tabId + '"]');
+            const selectedContent = document.getElementById(tabId);
+            
+            if (selectedButton) selectedButton.classList.add('active');
+            if (selectedContent) selectedContent.classList.add('active');
+
+            // リアクションシート固有の処理
+            if (tabId === 'reaction-sheet') {
+                document.getElementById('lessonTitle').value = document.title;
+                loadSubmissionHistory();
+            }
+        }
+
+        // フォーム処理
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyiye7N1A0Z12TQlSUcq9gtnnrzj__LRh7JpmKxfA_tfY-23oupzEpim3iE9osnE7brMw/exec';
+
+        document.getElementById('reactionForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('formStatus');
+            const formData = new FormData(e.target);
+            
+            const data = {
+                number: formData.get('number'),
+                lesson: formData.get('lesson'),
+                summary: formData.get('summary'),
+                questions: formData.get('questions'),
+                timestamp: new Date().toLocaleString()
+            };
+
+            // ローカルストレージに一旦保存
+            saveSubmissionLocal(data);
+
+            btn.disabled = true;
+            status.className = 'text-center p-3 rounded-lg font-medium bg-blue-50 text-blue-600 block';
+            status.textContent = '送信中...';
+
+            try {
+                // GASへの送信（CORS対応が必要なため実際にはGAS側の公開設定に依存）
+                // 実際のスプレッドシート連携時は Fetch API を使用
+                /*
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // GAS WebAppのための設定
+                    body: new URLSearchParams(formData)
+                });
+                */
+                
+                // シミュレーション
+                await new Promise(r => setTimeout(r, 1000));
+
+                status.className = 'text-center p-3 rounded-lg font-medium bg-green-50 text-green-600 block';
+                status.textContent = '送信が完了しました！履歴にも保存されています。';
+                e.target.reset();
+                loadSubmissionHistory();
+            } catch (err) {
+                status.className = 'text-center p-3 rounded-lg font-medium bg-red-50 text-red-600 block';
+                status.textContent = '送信中にエラーが発生しました。';
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // 4桁番号の入力制限（半角数字のみ）
+        document.getElementById('userNumber')?.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+
+        function saveSubmissionLocal(data) {
+            let history = JSON.parse(localStorage.getItem('lesson_submissions') || '[]');
+            history.unshift(data); // 最新を上に
+            localStorage.setItem('lesson_submissions', JSON.stringify(history.slice(0, 10))); // 直近10件
+        }
+
+        function loadSubmissionHistory() {
+            const container = document.getElementById('submissionHistory');
+            if (!container) return;
+            
+            const history = JSON.parse(localStorage.getItem('lesson_submissions') || '[]');
+            if (history.length === 0) {
+                container.innerHTML = '<p class="text-slate-400 text-sm italic">履歴はありません。</p>';
+                return;
+            }
+
+            container.innerHTML = history.map(item => 
+                '<div class="history-card">' +
+                    '<div class="history-date">' + item.timestamp + '</div>' +
+                    '<div class="font-bold text-indigo-600 mb-1">' + item.lesson + '</div>' +
+                    '<div class="text-slate-700 whitespace-pre-wrap"><span class="font-bold">まとめ:</span> ' + item.summary + '</div>' +
+                    (item.questions ? '<div class="text-slate-600 mt-2 text-sm italic"><span class="font-bold">？:</span> ' + item.questions + '</div>' : '') +
+                '</div>'
+            ).join('');
+        }
+        
+        // ページ読み込み時に最初のタブをアクティブに
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstTab = document.querySelector('.tab-button');
+            if (firstTab) {
+                const tabId = firstTab.dataset.tab;
+                switchTab(tabId);
+            }
+            
+            // カルーセルボタンの初期状態を設定
+            document.querySelectorAll('.quiz-carousel').forEach(carousel => {
+                const prevBtn = carousel.querySelector('.carousel-btn.prev');
+                if (prevBtn) prevBtn.disabled = true; // 最初のスライドなので前へボタンを無効化
+            });
+        });
+        
+        // アコーディオン
+        function toggleAccordion(element) {
+            const content = element.nextElementSibling;
+            const isOpen = element.classList.contains('active');
+            
+            if (isOpen) {
+                element.classList.remove('active');
+                content.classList.remove('open');
+            } else {
+                element.classList.add('active');
+                content.classList.add('open');
+            }
+        }
+    </script>
+</body>
+</html>`;
+}
+
+/**
+ * メイン処理
+ */
+function main() {
+    console.log('📚 授業記録の変換を開始します...\n');
+
+    // lessonsディレクトリ内の全Markdownファイルを取得
+    const files = fs.readdirSync(LESSONS_DIR)
+        .filter(f => f.endsWith('.md') && f !== 'template.md');
+
+    const lessonsData = [];
+
+    files.forEach(file => {
+        const filePath = path.join(LESSONS_DIR, file);
+        console.log(`処理中: ${file}`);
+
+        try {
+            const { frontmatter, markdown, filename } = parseMarkdownFile(filePath);
+
+            // クイズを変換
+            const quizHTML = convertQuizToHTML(markdown);
+
+            // MarkdownをHTMLに変換
+            let htmlContent = marked(quizHTML);
+
+            // 資料セクションをアコーディオン化
+            htmlContent = convertMaterialsToAccordion(htmlContent);
+
+            // タブ形式に変換
+            htmlContent = convertToTabStructure(htmlContent);
+
+            // 完全なHTMLを生成
+            const fullHTML = generateHTML(frontmatter, htmlContent);
+
+            // 出力ディレクトリを作成
+            const outputDir = path.join(OUTPUT_DIR, filename);
+            if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
+            }
+
+            // HTMLファイルを保存
+            const outputPath = path.join(outputDir, 'index.html');
+            fs.writeFileSync(outputPath, fullHTML, 'utf-8');
+
+            // lessons.json用のデータを追加
+            lessonsData.push({
+                id: lessonsData.length + 1,
+                date: frontmatter.date,
+                unit: frontmatter.unit,
+                title: `${frontmatter.subject}（${frontmatter.period}限）`,
+                summary: `${frontmatter.unit}について学習しました。`,
+                tags: [frontmatter.subject, `${frontmatter.period}限`],
+                readTime: '10分',
+                url: `note/${filename}/index.html`
+            });
+
+            console.log(`  ✓ 生成完了: ${outputPath}`);
+        } catch (error) {
+            console.error(`  ✗ エラー: ${file}`, error.message);
+        }
+    });
+
+    // lessons.jsonを更新
+    lessonsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+    fs.writeFileSync(LESSONS_JSON, JSON.stringify(lessonsData, null, 2), 'utf-8');
+    console.log(`\n✓ lessons.jsonを更新しました (${lessonsData.length}件)`);
+
+    console.log('\n🎉 変換が完了しました！');
+}
+
+main();

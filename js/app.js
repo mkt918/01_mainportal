@@ -156,12 +156,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ========================================
-    // Initialization (初期化)
-    // ========================================
+    /**
+     * CSVデータをパースして、指定されたテーマの雑学を表示
+     */
+    async function initHeroTrivia() {
+        const heroTitle = document.getElementById('hero-title');
+        if (!heroTitle) return;
+
+        try {
+            const response = await fetch(CONFIG.dataPaths.trivia);
+            if (!response.ok) throw new Error('Trivia fetch failed');
+
+            const csvText = await response.text();
+            const rows = csvText.split('\n').map(row => row.split(','));
+
+            // ヘッダーを除外してパース (theme, content)
+            const triviaList = rows.slice(1)
+                .filter(row => row.length >= 2)
+                .map(row => ({
+                    theme: row[0].trim(),
+                    content: row[1].trim()
+                }));
+
+            // 指定されたテーマでフィルタリング
+            const filteredTrivia = triviaList.filter(t => t.theme === CONFIG.activeTriviaTheme);
+
+            // 該当するテーマがない場合は全リストから選択
+            const sourceList = filteredTrivia.length > 0 ? filteredTrivia : triviaList;
+
+            if (sourceList.length > 0) {
+                const randomItem = sourceList[Math.floor(Math.random() * sourceList.length)];
+                heroTitle.textContent = randomItem.content;
+            } else {
+                heroTitle.textContent = '学びを、もっと。';
+            }
+        } catch (error) {
+            console.error('雑学の読み込みに失敗しました:', error);
+            heroTitle.textContent = '学びを、もっと クリエイティブ に。';
+        }
+    }
+
     function init() {
         initEventListeners();
         fetchData();
+        initHeroTrivia();
 
         // 時間割の初期化
         if (typeof Timetable !== 'undefined') {

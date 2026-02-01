@@ -6,8 +6,12 @@ const CONFIG = {
     // データファイルのパス
     dataPaths: {
         lessons: './data/lessons.json',
-        tools: './data/tools.json'
+        tools: './data/tools.json',
+        trivia: './data/trivia.csv'
     },
+
+    // 現在表示する雑学のテーマ ('動物', '宇宙', '科学', '歴史', '食べ物', '生活', 'IT' など)
+    activeTriviaTheme: '動物',
 
     // DOM要素のセレクタ
     selectors: {
