@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="description" content="授業の資料、学習ツール、授業記録をまとめたクラス専用ポータルサイト" />
+    <title>クラスポータル - 学習支援サイト</title>
+
+    <!-- External Styles -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet" />
+
+    <!-- Tailwind Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2563eb",
+                        "primary-dark": "#1d4ed8",
+                        "surface": "#f8fafc",
+                    },
+                    fontFamily: {
+                        "sans": ["Noto Sans JP", "sans-serif"],
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-white font-sans text-slate-800 min-h-screen">
+    <div class="layout-container flex h-full grow flex-col mesh-gradient">
+
+        <!-- ========================================
+             ナビゲーション
+             ======================================== -->
+        <header
+            class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-slate-200 bg-white/90 backdrop-blur-md px-10 py-3 lg:px-40">
+            <div class="flex items-center gap-4 text-primary">
+                <div class="size-6 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-3xl">school</span>
+                </div>
+                <h2 class="text-slate-800 text-lg font-bold leading-tight tracking-[-0.015em]">
+                    クラスポータル
+                </h2>
+            </div>
+            <div class="flex flex-1 justify-end gap-8 items-center">
+                <nav class="hidden md:flex items-center gap-9" aria-label="メインナビゲーション">
+                    <a class="text-slate-600 hover:text-primary transition-colors text-sm font-medium"
+                        href="#tools-section">学習ツール</a>
+                    <a class="text-slate-600 hover:text-primary transition-colors text-sm font-medium"
+                        href="#lessons-section">授業の記録</a>
+                    <a id="nav-timetable"
+                        class="text-slate-600 hover:text-primary transition-colors text-sm font-medium"
+                        href="javascript:void(0)">自分の予定</a>
+                </nav>
+                <div class="flex items-center gap-4">
+                    <button
+                        class="flex min-w-[100px] cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/30 hover:bg-primary-dark transition-colors">
+                        ログイン
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ========================================
+             時間割ドロワー
+             ======================================== -->
+        <div id="timetable-drawer" class="overflow-hidden bg-slate-50 border-b border-slate-200"
+            style="height: 0; transition: height 0.4s ease-in-out;">
+            <div class="max-w-[1200px] mx-auto px-10 py-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-slate-800 text-xl font-bold">週間時間割</h3>
+                        <p class="text-slate-500 text-sm">クリックして編集することができます（保存されます）</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button id="timetable-edit-toggle"
+                            class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium hover:border-primary hover:text-primary transition-all shadow-sm">
+                            <span class="material-symbols-outlined text-lg">settings</span>
+                            時間割設定
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 編集モードパネル (初期は隠蔽) -->
+                <div id="timetable-edit-panel"
+                    class="hidden mb-6 p-6 bg-primary/5 border border-primary/20 rounded-xl transition-all">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-primary uppercase">科目名</label>
+                            <input id="timetable-subject-name" type="text" placeholder="例: プログラミング"
+                                class="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-primary uppercase">教員名（任意）</label>
+                            <input id="timetable-teacher-name" type="text" placeholder="例: 山田 太郎"
+                                class="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
+                        </div>
+                        <div class="space-y-2 lg:col-span-2">
+                            <label class="block text-xs font-bold text-primary uppercase">ラベルカラー</label>
+                            <div id="timetable-color-palette" class="flex flex-wrap gap-2">
+                                <!-- js/timetable.js によって生成されます -->
+                            </div>
+                            <input id="timetable-selected-color" type="hidden" value="#e1effe">
+                        </div>
+                    </div>
+                    <div class="mt-6 flex items-center justify-between border-t border-primary/10 pt-4">
+                        <div id="timetable-status-msg"
+                            class="text-xs font-medium text-slate-500 invisible flex items-center gap-2">
+                            <span class="size-2 rounded-full bg-primary animate-pulse"></span>
+                            配置モード中: 表の空き時間を連続クリックしてください
+                        </div>
+                        <button id="timetable-apply-btn"
+                            class="px-8 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 active:scale-95">
+                            配置モード開始
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col xl:flex-row gap-8 items-start">
+                    <!-- 左側: 時間割グリッド (レスポンシブ対応) -->
+                    <div class="w-full xl:flex-1 overflow-hidden">
+                        <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                            <div class="min-w-[800px]">
+                                <table id="timetable-grid" class="w-full border-collapse bg-white">
+                                    <!-- js/timetable.js によって動的に生成されます -->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側: ToDoリスト (2カラム) -->
+                    <div class="w-full xl:w-[400px] flex flex-col gap-6 shrink-0">
+                        <div class="flex flex-col gap-4">
+                            <!-- 重要タスク (5個まで) -->
+                            <div class="bg-amber-50/50 border border-amber-200 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="text-amber-700 text-sm font-bold flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-lg">priority_high</span>
+                                        重要タスク <span id="todo-count-important"
+                                            class="text-xs font-normal opacity-70">(0/5)</span>
+                                    </h4>
+                                </div>
+                                <div id="todo-list-important" class="todo-drop-zone space-y-2 min-h-[100px]"
+                                    data-type="important">
+                                    <!-- js/todo.js によって動的に生成されます -->
+                                </div>
+                            </div>
+
+                            <!-- 通常タスク (15個まで) -->
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="text-slate-700 text-sm font-bold flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-lg">list</span>
+                                        通常タスク <span id="todo-count-normal"
+                                            class="text-xs font-normal opacity-70">(0/15)</span>
+                                    </h4>
+                                    <button id="todo-add-btn"
+                                        class="size-6 flex items-center justify-center bg-white border border-slate-200 rounded-full text-slate-400 hover:text-primary hover:border-primary transition-all shadow-sm">
+                                        <span class="material-symbols-outlined text-lg">add</span>
+                                    </button>
+                                </div>
+                                <div id="todo-list-normal" class="todo-drop-zone space-y-2 min-h-[150px]"
+                                    data-type="normal">
+                                    <!-- js/todo.js によって動的に生成されます -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- タスク追加用パネル (初期は隠蔽) -->
+                        <div id="todo-input-panel"
+                            class="hidden animate-fadeIn space-y-3 p-4 bg-white border border-primary/20 rounded-xl shadow-lg">
+                            <input id="todo-new-title" type="text" placeholder="タスクを入力してEnter..."
+                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
+                            <div class="flex justify-end gap-2">
+                                <button id="todo-cancel-btn"
+                                    class="px-3 py-1 text-xs text-slate-500 hover:text-slate-700">キャンセル</button>
+                                <button id="todo-save-btn"
+                                    class="px-3 py-1 bg-primary text-white text-xs font-bold rounded-md">保存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <main class="flex flex-1 flex-col items-center">
+
+                    <!-- ========================================
+                 ヒーローセクション
+                 ======================================== -->
+                    <section class="w-full max-w-[1200px] px-4 md:px-10 py-12 md:py-20" aria-labelledby="hero-title">
+                        <div
+                            class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-indigo-600 p-8 md:p-16 flex flex-col items-center text-center gap-8 shadow-xl">
+                            <div class="absolute inset-0 opacity-30 pointer-events-none"
+                                style="background-image: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.3) 0%, transparent 50%);">
+                            </div>
+                            <div class="flex flex-col gap-4 z-10">
+                                <span class="text-blue-100 font-mono text-sm tracking-widest uppercase">探究と創造の場</span>
+                                <h1 id="hero-title"
+                                    class="text-white text-5xl md:text-7xl font-black leading-tight tracking-[-0.033em]">
+                                    学びを、もっと <span class="text-yellow-300">クリエイティブ</span> に。
+                                </h1>
+                                <p class="text-blue-100 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                                    このサイトは授業の資料、便利な学習ツール、過去の授業記録をまとめたクラス専用ポータルです。
+                                </p>
+                            </div>
+                            <div class="flex flex-wrap gap-4 justify-center z-10">
+                                <a href="#tools-section"
+                                    class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-white text-primary text-base font-bold transition-transform hover:scale-105 shadow-lg">
+                                    ツールを使う
+                                </a>
+                                <a href="#lessons-section"
+                                    class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-white/20 text-white text-base font-bold border border-white/30 hover:bg-white/30 transition-colors">
+                                    授業記録を見る
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ========================================
+                 学習ツールセクション
+                 ======================================== -->
+                    <section id="tools-section" class="w-full max-w-[1200px] px-10 py-10" aria-labelledby="tools-title">
+                        <div class="flex items-center justify-between mb-8">
+                            <div>
+                                <h2 id="tools-title" class="text-slate-800 text-3xl font-bold tracking-tight">授業で活用するツール
+                                </h2>
+                                <p class="text-slate-500 text-sm mt-1">学習を効率化するWebアプリをセレクトしました。</p>
+                            </div>
+                        </div>
+                        <div id="tools-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- js/app.js によって動的に挿入されます -->
+                        </div>
+                    </section>
+
+                    <!-- ========================================
+                 授業記録セクション
+                 ======================================== -->
+                    <section id="lessons-section" class="w-full max-w-[1200px] px-10 py-20"
+                        aria-labelledby="lessons-title">
+                        <div class="mb-12 text-center">
+                            <h2 id="lessons-title" class="text-slate-800 text-4xl font-bold tracking-tight mb-2">授業の記録
+                            </h2>
+                            <p class="text-slate-500 mb-8">これまでの授業内容を日付や単元で振り返ることができます。</p>
+
+                            <!-- フィルタUI -->
+                            <div class="max-w-2xl mx-auto flex flex-col gap-4">
+                                <div class="relative">
+                                    <span
+                                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                                    <input id="lesson-search" type="text" placeholder="キーワード（単元名、内容など）で検索..."
+                                        class="w-full bg-white border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-slate-800 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+                                        aria-label="授業記録を検索">
+                                </div>
+                                <div id="tag-filters" class="flex flex-wrap justify-center gap-2" role="group"
+                                    aria-label="タグフィルター">
+                                    <!-- js/app.js によって動的に挿入されます -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative max-w-3xl mx-auto">
+                            <!-- 垂直タイムライン -->
+                            <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary/50 via-primary/20 to-transparent transform md:-translate-x-1/2 hidden sm:block"
+                                aria-hidden="true"></div>
+                            <div id="lessons-container" class="space-y-12">
+                                <!-- js/app.js によって動的に挿入されます -->
+                            </div>
+                        </div>
+                    </section>
+
+                </main>
+
+                <!-- ========================================
+             フッター
+             ======================================== -->
+                <footer class="border-t border-slate-200 bg-slate-50 py-12 px-10 md:px-40">
+                    <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center gap-3 text-slate-800">
+                                <span class="material-symbols-outlined text-primary">school</span>
+                                <span class="font-bold text-xl uppercase tracking-tighter">Class Portal</span>
+                            </div>
+                            <p class="text-slate-500 text-sm">© 2024 教育ポータルサイト。学びを未来へ繋ぐ。</p>
+                        </div>
+                        <div
+                            class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200">
+                            <div class="size-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></div>
+                            <span class="text-emerald-600 text-xs font-bold">現在の状態: 公開中</span>
+                        </div>
+                    </div>
+                </footer>
+
+            </div>
+
+            <!-- Scripts (順序が重要: config → templates → timetable → todo → app) -->
+            <script src="js/config.js"></script>
+            <script src="js/templates.js"></script>
+            <script src="js/timetable.js"></script>
+            <script src="js/todo.js"></script>
+            <script src="js/app.js"></script>
+</body>
+
+</html>

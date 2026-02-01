@@ -1,0 +1,50 @@
+[
+    {
+        "id": 1,
+        "name": "QuizMillion",
+        "description": "IT知識を楽しく学べるクイズアプリです。授業の復習に活用してください。",
+        "tags": [
+            "クイズ",
+            "IT基礎"
+        ],
+        "icon": "quiz",
+        "url": "https://mkt918.github.io/quizmillion/",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCTlBfwZ367rpXkc2j2LO3tF2MkwOyX-2Wcy7VPdeUUH3c2o9zC2A2Wq7Xtw0fpBbffjnodKCLhMln0n_StvuZhua8GRUW_CbgeE37OAJ6vpECzAHHmWYC2n757zyFxklO5GVFa8RlsRHvybLfguvjDfc9Hy5vOkC1D6dIGa-0Yw-AMKAf5rRZtAPmRog-R2rUmwINdMZT6YhsMdNRqT9eZ5Vkx-OUPXHaXS1FxUCfczEYUEi2T9ewcIylCAMjujqBJVYiNZiNS57xe"
+    },
+    {
+        "id": 2,
+        "name": "タイピング練習 (01)",
+        "description": "ブラインドタッチの習得を目指すための基礎練習ツールです。",
+        "tags": [
+            "練習",
+            "基礎"
+        ],
+        "icon": "keyboard",
+        "url": "https://mkt918.github.io/typing01/",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuD7ZNrD1fr1YDvTqioSGPe_SOaSe6vHoAY2Frc6zZWckPJKFd37CiPBao1UIP9s6Fnf_7e3g2gxsiYYyLL-57C4M_7gqylfnjBqRGZ8Gvz-J-LeDUMzeFuEt-dkcaQOQ3JUodEhMrh-XMPaaBB0quokXgaxu6xxgAWwHWlGpFAzC1nB_zbobI9W_m7jBC0_saejWka2p_vCtPG6AlDWen9WSV9meAx00syi3UVZEyYhK8seHU4s4_W6KmcS9Ig06y7Sm5q-a9MxIjlM"
+    },
+    {
+        "id": 3,
+        "name": "タイピング練習 (03)",
+        "description": "より高度なタイピングスキルを身につけるための応用練習ツールです。",
+        "tags": [
+            "練習",
+            "応用"
+        ],
+        "icon": "keyboard_command_key",
+        "url": "https://mkt918.github.io/typing03/",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAgHIEQ7B41dtmruWPxHXOnva2G8vE_iPne28mauGH_UPtmGb3-vzO9-satT5ClL3EVkyPgOvAfGZrkfZvsyxQ0V8gSu7-Q2PbSpRncjjrE-GgAcO0pwaIYq7EKgjW2Urrdq3GhVeotYtC09BvS2tpfjE7ULQEUtIVjaUOPbkxMtym8jFsfpiPJczYmT4IpQf-ujgvmZf4fa_ASERVdAoXFS1YQpAQJcBcwSiShcNLrPJdxYb0Y2YEda-G5jiR7CaRrqlSL5psxMqQ3"
+    },
+    {
+        "id": 4,
+        "name": "EDINETモニタ",
+        "description": "企業の財務情報を簡単に検索・閲覧できるツールです。",
+        "tags": [
+            "リサーチ",
+            "ビジネス"
+        ],
+        "icon": "monitoring",
+        "url": "https://mkt918.github.io/edinet_monitor/",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBhLTxthDhEVQLwPLguGM-KzJSwQZN6gGL4Jy-4L3R6YqEPTMNAZPL0LhBgIZXb18rIHh7l7516cXUrw2vE4m8pAmmZEu_MI2RgQ2w4AIQEFdph46a11don5NRLkZBhEwLiUrqP6VDjNHiCb8mHw0YR47cSOJi2016spK8FQka2lQuwNzmUDtClDtwwUJ_UKsmid0hhRBC7OFfPlLaTTxMDs6fYl0dL2wXnEVbTdOyUfMsTi3V4USQitEpWVEcgxflpMYmN__RrmpJL"
+    }
+]

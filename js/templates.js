@@ -1,0 +1,94 @@
+/**
+ * HTMLテンプレート生成関数（ライトモード対応版）
+ * UIコンポーネントのHTMLを一元管理し、再利用性を高める
+ */
+const Templates = {
+    /**
+     * ツールカードのHTMLを生成
+     * @param {Object} tool - ツールデータ
+     * @returns {string} HTML文字列
+     */
+    toolCard(tool) {
+        const tagsHtml = tool.tags
+            .map(tag => `<span class="text-[10px] px-2 py-1 bg-primary/10 text-primary rounded border border-primary/20 font-medium">${this.escapeHtml(tag).toUpperCase()}</span>`)
+            .join('');
+
+        return `
+            <div class="group relative flex flex-col overflow-hidden rounded-xl bg-white border border-slate-200 neon-glow transition-all duration-300 shadow-sm">
+                <div class="aspect-video bg-cover bg-center" style='background-image: url("${this.escapeHtml(tool.image)}")'>
+                    <div class="inset-0 bg-black/10 group-hover:bg-black/5 transition-colors h-full w-full"></div>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-primary text-xl">${this.escapeHtml(tool.icon)}</span>
+                        <h3 class="text-slate-800 text-xl font-bold">${this.escapeHtml(tool.name)}</h3>
+                    </div>
+                    <p class="text-slate-500 text-sm mb-4">${this.escapeHtml(tool.description)}</p>
+                    <div class="flex flex-wrap gap-2 mb-4">${tagsHtml}</div>
+                    <a href="${this.escapeHtml(tool.url)}" target="_blank" rel="noopener noreferrer" class="text-primary text-sm font-semibold flex items-center gap-1 hover:underline">
+                        ${CONFIG.labels.useTool} <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        `;
+    },
+
+    /**
+     * 授業カードのHTMLを生成
+     * @param {Object} lesson - 授業データ
+     * @returns {string} HTML文字列
+     */
+    lessonCard(lesson) {
+        const tagsHtml = lesson.tags
+            .map(tag => `<span class="text-[10px] text-slate-400">#${this.escapeHtml(tag)}</span>`)
+            .join('');
+
+        return `
+            <div class="relative flex flex-col md:flex-row items-center gap-8 group lesson-item" data-tags="${this.escapeHtml(lesson.tags.join(','))}">
+                <div class="hidden md:block absolute left-0 md:left-1/2 size-4 bg-primary rounded-full transform md:-translate-x-1/2 shadow-lg shadow-primary/30 z-10"></div>
+                <div class="w-full md:w-[45%] glass-card p-6 rounded-xl group-hover:shadow-lg transition-all ml-0 md:ml-auto">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2 text-primary text-xs font-bold">
+                            <span class="material-symbols-outlined text-sm">calendar_month</span> ${this.escapeHtml(lesson.date)}
+                        </div>
+                        <span class="text-slate-500 text-[10px] bg-slate-100 px-2 py-0.5 rounded font-medium">${this.escapeHtml(lesson.unit)}</span>
+                    </div>
+                    <h4 class="text-slate-800 text-lg font-bold mb-3">${this.escapeHtml(lesson.title)}</h4>
+                    <p class="text-slate-500 text-sm mb-4">${this.escapeHtml(lesson.summary)}</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex gap-2">${tagsHtml}</div>
+                        <a class="text-primary text-sm font-medium hover:underline inline-flex items-center gap-1" href="${this.escapeHtml(lesson.url)}">
+                            ${CONFIG.labels.viewMaterial} <span class="material-symbols-outlined text-xs">open_in_new</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden md:block w-1/2"></div>
+            </div>
+        `;
+    },
+
+    /**
+     * フィルターボタンのHTMLを生成
+     * @param {string} tag - タグ名
+     * @param {boolean} isActive - アクティブ状態
+     * @returns {string} HTML文字列
+     */
+    filterButton(tag, isActive = false) {
+        const activeClasses = isActive
+            ? 'border-primary text-primary bg-primary/10 active'
+            : 'border-slate-200 text-slate-500 bg-white';
+        return `<button class="filter-tag px-3 py-1 rounded-full border text-xs font-medium hover:border-primary hover:text-primary transition-all shadow-sm ${activeClasses}" data-tag="${this.escapeHtml(tag)}">${this.escapeHtml(tag)}</button>`;
+    },
+
+    /**
+     * XSS対策: HTMLエスケープ
+     * @param {string} str - エスケープする文字列
+     * @returns {string} エスケープされた文字列
+     */
+    escapeHtml(str) {
+        if (str == null) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+};
