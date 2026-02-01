@@ -949,7 +949,7 @@ function main() {
 
     // lessonsディレクトリ内の全Markdownファイルを取得
     const files = fs.readdirSync(LESSONS_DIR)
-        .filter(f => f.endsWith('.md') && f !== 'template.md');
+        .filter(f => f.endsWith('.md') && f !== 'template.md' && f !== 'README.md');
 
     const lessonsData = [];
 
