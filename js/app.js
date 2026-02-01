@@ -1,13 +1,9 @@
 /**
  * クラスポータル - メインアプリケーション
- * 
- * 依存関係:
- * - config.js (設定定数)
- * - templates.js (HTMLテンプレート)
  */
 document.addEventListener('DOMContentLoaded', () => {
     // ========================================
-    // State (状態管理)
+    // State
     // ========================================
     const state = {
         allLessons: [],
@@ -16,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ========================================
-    // DOM Elements (DOM要素キャッシュ)
+    // DOM Elements
     // ========================================
     const elements = {
         lessonsContainer: document.getElementById(CONFIG.selectors.lessonsContainer),
@@ -26,46 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ========================================
-    // Data Fetching（データ取得）
-    // ========================================
-    /**
-     * JSONデータの取得と初期化
-     * lessons.json と tools.json を並列で取得し、
-     * 取得完了後にレンダリングを実行
-     */
-    async function fetchData() {
-        try {
-            console.log('📊 データ取得を開始します...');
-            console.log('Lessons path:', CONFIG.dataPaths.lessons);
-            console.log('Tools path:', CONFIG.dataPaths.tools);
-
-            const [lessonsRes, toolsRes] = await Promise.all([
-                fetch(CONFIG.dataPaths.lessons),
-                fetch(CONFIG.dataPaths.tools)
-            ]);
-
-            console.log('Lessons response status:', lessonsRes.status);
-            console.log('Tools response status:', toolsRes.status);
-
-            if (!lessonsRes.ok || !toolsRes.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            state.allLessons = await lessonsRes.json();
-            state.allTools = await toolsRes.json();
-
-            console.log('✅ データ取得成功:', state.allLessons.length, '件の授業記録');
-            console.log('✅ ツール取得成功:', state.allTools.length, '件のツール');
-
-            renderAll();
-        } catch (error) {
-            console.error('❌ データの取得に失敗しました:', error);
-            showError('データの読み込みに失敗しました。ページを再読み込みしてください。');
-        }
-    }
-
-    // ========================================
-    // Rendering (描画)
+    // Rendering
     // ========================================
     function renderAll() {
         renderTools(state.allTools);
@@ -81,11 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderLessons(lessons) {
         if (!elements.lessonsContainer) return;
         if (lessons.length === 0) {
-            elements.lessonsContainer.innerHTML = `
-                <div class="text-center text-slate-400 py-8">
-                    該当する授業記録が見つかりませんでした。
-                </div>
-            `;
+            elements.lessonsContainer.innerHTML = `<div class="col-span-full py-20 text-center text-slate-400">授業記録が見つかりませんでした。</div>`;
             return;
         }
         elements.lessonsContainer.innerHTML = lessons.map(lesson => Templates.lessonCard(lesson)).join('');
@@ -93,32 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderFilters(lessons) {
         if (!elements.tagFilterContainer) return;
-
         const tags = [...new Set(lessons.flatMap(l => l.tags))];
         const allButton = Templates.filterButton(CONFIG.labels.allFilter, true);
         const tagButtons = tags.map(tag => Templates.filterButton(tag, false)).join('');
-
         elements.tagFilterContainer.innerHTML = allButton + tagButtons;
         attachFilterListeners();
     }
 
-    function showError(message) {
-        if (elements.lessonsContainer) {
-            elements.lessonsContainer.innerHTML = `
-                <div class="text-center text-red-400 py-8">
-                    <span class="material-symbols-outlined text-3xl mb-2">error</span>
-                    <p>${Templates.escapeHtml(message)}</p>
-                </div>
-            `;
-        }
-    }
-
-    // ========================================
-    // Filtering (フィルタリング)
-    // ========================================
     function filterLessons(tag, query) {
         const normalizedQuery = query.toLowerCase().trim();
-
         const filtered = state.allLessons.filter(lesson => {
             const matchesTag = tag === 'all' || tag === CONFIG.labels.allFilter || lesson.tags.includes(tag);
             const matchesQuery = normalizedQuery === '' ||
@@ -127,91 +63,71 @@ document.addEventListener('DOMContentLoaded', () => {
                 lesson.unit.toLowerCase().includes(normalizedQuery);
             return matchesTag && matchesQuery;
         });
-
         renderLessons(filtered);
     }
 
-    function updateActiveFilter(clickedBtn) {
-        document.querySelectorAll('.filter-tag').forEach(btn => {
-            btn.classList.remove(...CONFIG.classes.filterActive);
-            btn.classList.add(...CONFIG.classes.filterInactive);
-        });
-        clickedBtn.classList.add(...CONFIG.classes.filterActive);
-        clickedBtn.classList.remove(...CONFIG.classes.filterInactive);
-    }
-
-    // ========================================
-    // Event Listeners (イベントリスナー)
-    // ========================================
     function attachFilterListeners() {
         document.querySelectorAll('.filter-tag').forEach(btn => {
             btn.addEventListener('click', () => {
-                updateActiveFilter(btn);
+                document.querySelectorAll('.filter-tag').forEach(b => {
+                    b.classList.remove(...CONFIG.classes.filterActive);
+                    b.classList.add(...CONFIG.classes.filterInactive);
+                });
+                btn.classList.add(...CONFIG.classes.filterActive);
+                btn.classList.remove(...CONFIG.classes.filterInactive);
                 state.activeFilter = btn.dataset.tag;
                 filterLessons(state.activeFilter, elements.searchInput?.value || '');
             });
         });
     }
 
-    function initEventListeners() {
-        if (elements.searchInput) {
-            // debounce（遅延処理）で検索パフォーマンスを向上
-            let debounceTimer;
-            elements.searchInput.addEventListener('input', (e) => {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => {
-                    filterLessons(state.activeFilter, e.target.value);
-                }, 150);
-            });
-        }
-    }
+    // ========================================
+    // Drawers
+    // ========================================
+    function setupDrawer(navId, drawerId) {
+        const nav = document.getElementById(navId);
+        const drawer = document.getElementById(drawerId);
+        if (!nav || !drawer) return;
 
-    /**
-     * CSVデータをパースして、指定されたテーマの雑学を表示
-     */
-    async function initHeroTrivia() {
-        const heroTitle = document.getElementById('hero-title');
-        if (!heroTitle) return;
+        let isTransitioning = false;
 
-        try {
-            const response = await fetch(CONFIG.dataPaths.trivia);
-            if (!response.ok) throw new Error('Trivia fetch failed');
+        nav.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isTransitioning) return;
 
-            const csvText = await response.text();
-            const rows = csvText.split('\n').map(row => row.split(','));
+            const isOpen = drawer.classList.contains('is-open');
 
-            // ヘッダーを除外してパース (theme, content)
-            const triviaList = rows.slice(1)
-                .filter(row => row.length >= 2)
-                .map(row => ({
-                    theme: row[0].trim(),
-                    content: row[1].trim()
-                }));
-
-            // 指定されたテーマでフィルタリング
-            const filteredTrivia = triviaList.filter(t => t.theme === CONFIG.activeTriviaTheme);
-
-            // 該当するテーマがない場合は全リストから選択
-            const sourceList = filteredTrivia.length > 0 ? filteredTrivia : triviaList;
-
-            if (sourceList.length > 0) {
-                const randomItem = sourceList[Math.floor(Math.random() * sourceList.length)];
-                heroTitle.textContent = randomItem.content;
+            if (!isOpen) {
+                if (drawerId === 'history-drawer') renderHistory();
+                isTransitioning = true;
+                drawer.classList.add('is-open');
+                const contentHeight = drawer.firstElementChild.scrollHeight;
+                drawer.style.height = contentHeight + 'px';
+                const handleTransitionEnd = () => {
+                    if (drawer.classList.contains('is-open')) drawer.style.height = 'auto';
+                    isTransitioning = false;
+                    drawer.removeEventListener('transitionend', handleTransitionEnd);
+                };
+                drawer.addEventListener('transitionend', handleTransitionEnd);
             } else {
-                heroTitle.textContent = '学びを、もっと。';
+                isTransitioning = true;
+                const contentHeight = drawer.firstElementChild.scrollHeight;
+                drawer.style.height = contentHeight + 'px';
+                drawer.offsetHeight; // force reflow
+                drawer.classList.remove('is-open');
+                drawer.style.height = '0px';
+                const handleTransitionEnd = () => {
+                    isTransitioning = false;
+                    drawer.removeEventListener('transitionend', handleTransitionEnd);
+                };
+                drawer.addEventListener('transitionend', handleTransitionEnd);
             }
-        } catch (error) {
-            console.error('雑学の読み込みに失敗しました:', error);
-            heroTitle.textContent = '学びを、もっと クリエイティブ に。';
-        }
+        });
     }
 
-    // 各ドロワーのセットアップ
-    setupDrawer('nav-timetable', 'timetable-drawer');
-    setupDrawer('nav-history', 'history-drawer');
-    setupDrawer('nav-theme', 'theme-drawer');
-
-    // テーマカスタマイズ機能
+    // ========================================
+    // Theme Customization
+    // ========================================
     function initThemeCustomization() {
         const hero = document.getElementById('hero-section');
         const colorGrid = document.getElementById('theme-color-grid');
@@ -274,7 +190,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // リアクション履歴の描画とフィルタリング
+    // ========================================
+    // History
+    // ========================================
     function renderHistory() {
         const container = document.getElementById('history-content');
         const monthFilter = document.getElementById('history-month-filter');
@@ -282,49 +200,78 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container) return;
 
         const allHistory = JSON.parse(localStorage.getItem('lesson_submissions') || '[]');
+        if (allHistory.length === 0) {
+            container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400">履歴がまだありません。</div>`;
+            return;
+        }
 
-        if (monthFilter && monthFilter.options.length === 1 && allHistory.length > 0) {
-            const months = [...new Set(allHistory.map(item => {
-                const date = item.timestamp.split(' ')[0];
-                return date.substring(0, 7);
-            }))].sort().reverse();
-
+        if (monthFilter && monthFilter.options.length === 1) {
+            const months = [...new Set(allHistory.map(item => item.timestamp.split(' ')[0].substring(0, 7)))].sort().reverse();
             months.forEach(m => {
                 const opt = document.createElement('option');
                 opt.value = m;
                 opt.textContent = m.replace('-', '年 ') + '月';
                 monthFilter.appendChild(opt);
             });
-
             monthFilter.addEventListener('change', renderHistory);
             searchInput.addEventListener('input', renderHistory);
         }
 
-        const activeMonth = monthFilter ? monthFilter.value : 'all';
-        const searchQuery = searchInput ? searchInput.value.toLowerCase() : '';
+        const activeMonth = monthFilter?.value || 'all';
+        const searchQuery = searchInput?.value.toLowerCase() || '';
 
-        const filteredHistory = allHistory.filter(item => {
-            const date = item.timestamp.split(' ')[0];
-            const month = date.substring(0, 7);
+        const filtered = allHistory.filter(item => {
+            const month = item.timestamp.split(' ')[0].substring(0, 7);
             const matchesMonth = activeMonth === 'all' || month === activeMonth;
-            const matchesSearch = item.lesson.toLowerCase().includes(searchQuery) ||
-                item.summary.toLowerCase().includes(searchQuery);
+            const matchesSearch = item.lesson.toLowerCase().includes(searchQuery) || item.summary.toLowerCase().includes(searchQuery);
             return matchesMonth && matchesSearch;
         });
 
-        if (filteredHistory.length === 0) {
-            container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400">履歴が見つかりませんでした。</div>`;
-            return;
-        }
-
-        container.innerHTML = filteredHistory.map(item => {
+        container.innerHTML = filtered.map(item => {
             const lesson = state.allLessons.find(l => l.title.includes(item.lesson) || item.lesson.includes(l.title));
             return Templates.historyCard(item, lesson ? lesson.url : '#');
         }).join('');
     }
 
-    initThemeCustomization();
-}
+    // ========================================
+    // Data Loading
+    // ========================================
+    async function fetchData() {
+        try {
+            const [lessonsRes, toolsRes] = await Promise.all([
+                fetch(CONFIG.dataPaths.lessons),
+                fetch(CONFIG.dataPaths.tools)
+            ]);
+            state.allLessons = await lessonsRes.json();
+            state.allTools = await toolsRes.json();
+            renderAll();
+        } catch (error) {
+            console.error('Data fetch error:', error);
+        }
+    }
+
+    // ========================================
+    // Initialize
+    // ========================================
+    function init() {
+        fetchData();
+        setupDrawer('nav-timetable', 'timetable-drawer');
+        setupDrawer('nav-history', 'history-drawer');
+        setupDrawer('nav-theme', 'theme-drawer');
+        initThemeCustomization();
+
+        if (elements.searchInput) {
+            let debounceTimer;
+            elements.searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => filterLessons(state.activeFilter, e.target.value), 150);
+            });
+        }
+
+        if (typeof Timetable !== 'undefined') Timetable.init();
+        if (typeof ToDo !== 'undefined') ToDo.init();
+        if (typeof initHeroTrivia !== 'undefined') initHeroTrivia();
+    }
 
     init();
 });
