@@ -34,6 +34,33 @@ const Templates = {
     },
 
     /**
+     * リアクション履歴カードのHTMLを生成
+     * @param {Object} item - 提出データ
+     * @returns {string} HTML文字列
+     */
+    historyCard(item) {
+        return `
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-3 text-[10px] text-slate-400">
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">schedule</span> ${this.escapeHtml(item.timestamp)}
+                    </div>
+                </div>
+                <h4 class="text-indigo-600 font-bold mb-2 text-sm">${this.escapeHtml(item.lesson)}</h4>
+                <div class="text-slate-700 text-sm leading-relaxed mb-3 line-clamp-3">
+                    <span class="font-bold text-xs text-slate-400 block mb-1 uppercase tracking-wider">Summary</span>
+                    ${this.escapeHtml(item.summary)}
+                </div>
+                ${item.questions ? `
+                <div class="text-slate-600 text-xs italic bg-white p-3 rounded-lg border border-slate-100">
+                    <span class="font-bold text-slate-400 not-italic block mb-1">Questions:</span>
+                    ${this.escapeHtml(item.questions)}
+                </div>` : ''}
+            </div>
+        `;
+    },
+
+    /**
      * 授業カードのHTMLを生成
      * @param {Object} lesson - 授業データ
      * @returns {string} HTML文字列

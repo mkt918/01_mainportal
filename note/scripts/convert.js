@@ -311,12 +311,21 @@ ${remainingContent.trim()}`;
  * HTMLテンプレートを生成（モダンデザイン版）
  */
 function generateHTML(data, htmlContent) {
+    // 日付フォーマット (yyyy-mm-dd)
+    const dateObj = new Date(data.date);
+    const formattedDate = dateObj.getFullYear() + '-' +
+        String(dateObj.getMonth() + 1).padStart(2, '0') + '-' +
+        String(dateObj.getDate()).padStart(2, '0');
+
+    // 限の重複防止
+    const periodText = data.period.toString().includes('限') ? data.period : `${data.period}限`;
+
     return `<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${data.subject} - ${data.date}</title>
+    <title>${data.subject} - ${data.unit}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
@@ -335,7 +344,7 @@ function generateHTML(data, htmlContent) {
             align-items: center;
             gap: 16px;
             background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
         .quiz-option:hover {
@@ -471,7 +480,7 @@ function generateHTML(data, htmlContent) {
         .accordion-header.active .accordion-icon {
             transform: rotate(180deg);
         }
-        
+
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -482,7 +491,7 @@ function generateHTML(data, htmlContent) {
                 transform: translateY(0);
             }
         }
-        
+
         /* カルーセルスタイル */
         .quiz-carousel {
             position: relative;
@@ -555,7 +564,7 @@ function generateHTML(data, htmlContent) {
             border-radius: 16px;
             padding: 24px;
             margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
         
         .pdf-viewer {
@@ -563,16 +572,16 @@ function generateHTML(data, htmlContent) {
             height: 600px;
             border: none;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* タブシステム */
         .tab-container {
             background: white;
             border-radius: 16px;
             padding: 0;
             margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             overflow: hidden;
         }
         
@@ -627,7 +636,7 @@ function generateHTML(data, htmlContent) {
         .tab-content.active {
             display: block;
         }
-        
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -660,188 +669,188 @@ function generateHTML(data, htmlContent) {
             color: #94a3b8;
             margin-bottom: 4px;
         }
-    </style>
-</head>
-<body class="font-sans p-4 md:p-8">
-    <div class="max-w-4xl mx-auto">
-        <a href="../../index.html" class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium mb-6 transition-colors">
-            <span class="material-symbols-outlined text-xl">arrow_back</span>
-            ポータルに戻る
-        </a>
-        
-        <!-- ヘッダー -->
+    </style >
+</head >
+    <body class="font-sans p-4 md:p-8">
+        <div class="max-w-4xl mx-auto">
+            <a href="../../index.html" class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium mb-6 transition-colors">
+                <span class="material-symbols-outlined text-xl">arrow_back</span>
+                ポータルに戻る
+            </a>
+
+            <!-- ヘッダー -->
         <div class="section-card mb-8">
             <div class="flex items-center gap-3 text-slate-500 text-sm mb-3">
                 <span class="material-symbols-outlined text-lg">calendar_month</span>
-                <span>${data.date}</span>
+                <span>${formattedDate}</span>
                 <span class="mx-1">|</span>
-                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">${data.period}限</span>
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">${periodText}</span>
             </div>
             <h1 class="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">${data.subject}</h1>
             <p class="text-xl text-slate-600">${data.unit}</p>
         </div>
 
-        <!-- メインコンテンツ -->
-        <div class="prose prose-slate max-w-none">
-            ${htmlContent}
+            <!-- メインコンテンツ -->
+            <div class="prose prose-slate max-w-none">
+                ${htmlContent}
+            </div>
         </div>
-    </div>
 
-    <script>
+        <script>
         // クイズ管理
-        const quizState = {};
-        
-        function selectAnswer(questionId, optionElement) {
+            const quizState = { };
+
+            function selectAnswer(questionId, optionElement) {
             // 同じ問題の他の選択肢の選択を解除
             const questionDiv = optionElement.closest('.quiz-question');
             questionDiv.querySelectorAll('.quiz-option').forEach(opt => {
                 opt.classList.remove('selected');
             });
-            
+
             // 選択状態を保存
             optionElement.classList.add('selected');
             quizState[questionId] = optionElement;
-            
+
             // 答え合わせボタンを有効化
             const checkBtn = questionDiv.querySelector('.check-answer-btn');
             if (checkBtn) checkBtn.disabled = false;
         }
-        
-        function checkAnswer(questionId) {
+
+            function checkAnswer(questionId) {
             const selectedOption = quizState[questionId];
             if (!selectedOption) return;
-            
+
             const questionDiv = selectedOption.closest('.quiz-question');
             const isCorrect = selectedOption.dataset.correct === 'true';
             const feedback = questionDiv.querySelector('.quiz-feedback');
             const checkBtn = questionDiv.querySelector('.check-answer-btn');
-            
+
             // すべての選択肢を無効化
             questionDiv.querySelectorAll('.quiz-option').forEach(opt => {
                 opt.classList.add('disabled');
-                if (opt.dataset.correct === 'true') {
-                    opt.classList.add('correct');
+            if (opt.dataset.correct === 'true') {
+                opt.classList.add('correct');
                 }
             });
-            
+
             // フィードバック表示
             feedback.classList.add('show');
             if (isCorrect) {
                 selectedOption.classList.add('correct');
-                feedback.classList.add('correct');
-                feedback.innerHTML = '<span class="material-symbols-outlined" style="vertical-align: middle;">check_circle</span> 正解です！よくできました。';
+            feedback.classList.add('correct');
+            feedback.innerHTML = '<span class="material-symbols-outlined" style="vertical-align: middle;">check_circle</span> 正解です！よくできました。';
             } else {
                 selectedOption.classList.add('incorrect');
-                feedback.classList.add('incorrect');
-                feedback.innerHTML = '<span class="material-symbols-outlined" style="vertical-align: middle;">cancel</span> 不正解です。正解を確認してください。';
+            feedback.classList.add('incorrect');
+            feedback.innerHTML = '<span class="material-symbols-outlined" style="vertical-align: middle;">cancel</span> 不正解です。正解を確認してください。';
             }
-            
+
             // ボタンを非表示
             if (checkBtn) checkBtn.style.display = 'none';
         }
-        
-        // 即座に答え合わせ（クリック時）
-        function checkAnswerImmediately(questionId, optionElement) {
+
+            // 即座に答え合わせ（クリック時）
+            function checkAnswerImmediately(questionId, optionElement) {
             const questionDiv = optionElement.closest('.quiz-question');
-            
+
             // すでに答え合わせ済みの場合は何もしない
             if (questionDiv.classList.contains('answered')) return;
-            
+
             const isCorrect = optionElement.dataset.correct === 'true';
             const feedback = questionDiv.querySelector('.quiz-feedback');
-            
+
             // 答え合わせ済みマークを付ける
             questionDiv.classList.add('answered');
-            
+
             // すべての選択肢を無効化
             questionDiv.querySelectorAll('.quiz-option').forEach(opt => {
                 opt.classList.add('disabled');
-                if (opt.dataset.correct === 'true') {
-                    opt.classList.add('correct');
+            if (opt.dataset.correct === 'true') {
+                opt.classList.add('correct');
                 }
             });
-            
+
             // フィードバック表示
             feedback.classList.add('show');
             if (isCorrect) {
                 optionElement.classList.add('correct');
-                feedback.classList.add('correct');
-                feedback.innerHTML = '<span class="material-symbols-outlined" style="vertical-align: middle;">check_circle</span> 正解です！よくできました。';
+            feedback.classList.add('correct');
+            feedback.innerHTML = '<span class="material-symbols-outlined" style="vertical-align: middle;">check_circle</span> 正解です！よくできました。';
             } else {
                 optionElement.classList.add('incorrect');
-                feedback.classList.add('incorrect');
-                feedback.innerHTML = '<span class="material-symbols-outlined" style="vertical-align: middle;">cancel</span> 不正解です。正解を確認してください。';
+            feedback.classList.add('incorrect');
+            feedback.innerHTML = '<span class="material-symbols-outlined" style="vertical-align: middle;">cancel</span> 不正解です。正解を確認してください。';
             }
         }
-        
-        // カルーセルナビゲーション
-        function navigateCarousel(carouselId, direction) {
+
+            // カルーセルナビゲーション
+            function navigateCarousel(carouselId, direction) {
             const carousel = document.querySelector('[data-carousel="' + carouselId + '"]');
             if (!carousel) return;
-            
+
             const items = carousel.querySelectorAll('.carousel-item');
             const currentIndex = Array.from(items).findIndex(item => item.classList.contains('active'));
             const newIndex = currentIndex + direction;
-            
+
             // 範囲チェック
             if (newIndex < 0 || newIndex >= items.length) return;
-            
+
             // アクティブアイテムを切り替え
             items[currentIndex].classList.remove('active');
             items[newIndex].classList.add('active');
-            
+
             // インジケーターを更新
             const indicator = carousel.querySelector('.current-slide');
             if (indicator) {
                 indicator.textContent = newIndex + 1;
             }
-            
+
             // ボタンの有効/無効を更新
             const prevBtn = carousel.querySelector('.carousel-btn.prev');
             const nextBtn = carousel.querySelector('.carousel-btn.next');
             if (prevBtn) prevBtn.disabled = newIndex === 0;
             if (nextBtn) nextBtn.disabled = newIndex === items.length - 1;
         }
-        
-        // タブ切り替え
-        function switchTab(tabId) {
-            // すべてのタブボタンとコンテンツを非アクティブに
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
+
+            // タブ切り替え
+            function switchTab(tabId) {
+                // すべてのタブボタンとコンテンツを非アクティブに
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
-            
+
             // 選択されたタブをアクティブに
             const selectedButton = document.querySelector('[data-tab="' + tabId + '"]');
             const selectedContent = document.getElementById(tabId);
-            
+
             if (selectedButton) selectedButton.classList.add('active');
             if (selectedContent) selectedContent.classList.add('active');
 
             // リアクションシート固有の処理
             if (tabId === 'reaction-sheet') {
                 document.getElementById('lessonTitle').value = document.title;
-                loadSubmissionHistory();
+            loadSubmissionHistory();
             }
         }
 
-        // フォーム処理
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyiye7N1A0Z12TQlSUcq9gtnnrzj__LRh7JpmKxfA_tfY-23oupzEpim3iE9osnE7brMw/exec';
+            // フォーム処理
+            const GAS_URL = 'https://script.google.com/macros/s/AKfycbyiye7N1A0Z12TQlSUcq9gtnnrzj__LRh7JpmKxfA_tfY-23oupzEpim3iE9osnE7brMw/exec';
 
         document.getElementById('reactionForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
+                e.preventDefault();
             const btn = document.getElementById('submitBtn');
             const status = document.getElementById('formStatus');
             const formData = new FormData(e.target);
-            
+
             const data = {
                 number: formData.get('number'),
-                lesson: formData.get('lesson'),
-                summary: formData.get('summary'),
-                questions: formData.get('questions'),
-                timestamp: new Date().toLocaleString()
+            lesson: formData.get('lesson'),
+            summary: formData.get('summary'),
+            questions: formData.get('questions'),
+            timestamp: new Date().toLocaleString()
             };
 
             // ローカルストレージに一旦保存
@@ -852,26 +861,20 @@ function generateHTML(data, htmlContent) {
             status.textContent = '送信中...';
 
             try {
-                // GASへの送信（CORS対応が必要なため実際にはGAS側の公開設定に依存）
-                // 実際のスプレッドシート連携時は Fetch API を使用
-                /*
-                const response = await fetch(GAS_URL, {
+                // GASへの送信
+                await fetch(GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors', // GAS WebAppのための設定
                     body: new URLSearchParams(formData)
                 });
-                */
-                
-                // シミュレーション
-                await new Promise(r => setTimeout(r, 1000));
 
-                status.className = 'text-center p-3 rounded-lg font-medium bg-green-50 text-green-600 block';
-                status.textContent = '送信が完了しました！履歴にも保存されています。';
-                e.target.reset();
-                loadSubmissionHistory();
+            status.className = 'text-center p-3 rounded-lg font-medium bg-green-50 text-green-600 block';
+            status.textContent = '送信が完了しました！履歴にも保存されています。';
+            e.target.reset();
+            loadSubmissionHistory();
             } catch (err) {
                 status.className = 'text-center p-3 rounded-lg font-medium bg-red-50 text-red-600 block';
-                status.textContent = '送信中にエラーが発生しました。';
+            status.textContent = '送信中にエラーが発生しました。';
             } finally {
                 btn.disabled = false;
             }
@@ -879,66 +882,66 @@ function generateHTML(data, htmlContent) {
 
         // 4桁番号の入力制限（半角数字のみ）
         document.getElementById('userNumber')?.addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
         });
 
-        function saveSubmissionLocal(data) {
-            let history = JSON.parse(localStorage.getItem('lesson_submissions') || '[]');
+            function saveSubmissionLocal(data) {
+                let history = JSON.parse(localStorage.getItem('lesson_submissions') || '[]');
             history.unshift(data); // 最新を上に
             localStorage.setItem('lesson_submissions', JSON.stringify(history.slice(0, 10))); // 直近10件
         }
 
-        function loadSubmissionHistory() {
+            function loadSubmissionHistory() {
             const container = document.getElementById('submissionHistory');
             if (!container) return;
-            
+
             const history = JSON.parse(localStorage.getItem('lesson_submissions') || '[]');
             if (history.length === 0) {
                 container.innerHTML = '<p class="text-slate-400 text-sm italic">履歴はありません。</p>';
-                return;
+            return;
             }
 
-            container.innerHTML = history.map(item => 
-                '<div class="history-card">' +
-                    '<div class="history-date">' + item.timestamp + '</div>' +
-                    '<div class="font-bold text-indigo-600 mb-1">' + item.lesson + '</div>' +
-                    '<div class="text-slate-700 whitespace-pre-wrap"><span class="font-bold">まとめ:</span> ' + item.summary + '</div>' +
-                    (item.questions ? '<div class="text-slate-600 mt-2 text-sm italic"><span class="font-bold">？:</span> ' + item.questions + '</div>' : '') +
+            container.innerHTML = history.map(item =>
+            '<div class="history-card">' +
+                '<div class="history-date">' + item.timestamp + '</div>' +
+                '<div class="font-bold text-indigo-600 mb-1">' + item.lesson + '</div>' +
+                '<div class="text-slate-700 whitespace-pre-wrap"><span class="font-bold">まとめ:</span> ' + item.summary + '</div>' +
+                (item.questions ? '<div class="text-slate-600 mt-2 text-sm italic"><span class="font-bold">？:</span> ' + item.questions + '</div>' : '') +
                 '</div>'
             ).join('');
         }
-        
+
         // ページ読み込み時に最初のタブをアクティブに
         document.addEventListener('DOMContentLoaded', () => {
             const firstTab = document.querySelector('.tab-button');
             if (firstTab) {
                 const tabId = firstTab.dataset.tab;
-                switchTab(tabId);
+            switchTab(tabId);
             }
-            
+
             // カルーセルボタンの初期状態を設定
             document.querySelectorAll('.quiz-carousel').forEach(carousel => {
                 const prevBtn = carousel.querySelector('.carousel-btn.prev');
-                if (prevBtn) prevBtn.disabled = true; // 最初のスライドなので前へボタンを無効化
+            if (prevBtn) prevBtn.disabled = true; // 最初のスライドなので前へボタンを無効化
             });
         });
-        
-        // アコーディオン
-        function toggleAccordion(element) {
+
+            // アコーディオン
+            function toggleAccordion(element) {
             const content = element.nextElementSibling;
             const isOpen = element.classList.contains('active');
-            
+
             if (isOpen) {
                 element.classList.remove('active');
-                content.classList.remove('open');
+            content.classList.remove('open');
             } else {
                 element.classList.add('active');
-                content.classList.add('open');
+            content.classList.add('open');
             }
         }
-    </script>
-</body>
-</html>`;
+        </script>
+    </body>
+</html > `;
 }
 
 /**
@@ -955,7 +958,7 @@ function main() {
 
     files.forEach(file => {
         const filePath = path.join(LESSONS_DIR, file);
-        console.log(`処理中: ${file}`);
+        console.log(`処理中: ${file} `);
 
         try {
             const { frontmatter, markdown, filename } = parseMarkdownFile(filePath);
@@ -990,9 +993,15 @@ function main() {
                 ? frontmatter.period
                 : `${frontmatter.period}限`;
 
+            // 日付を yyyy-mm-dd にフォーマット
+            const dateObj = new Date(frontmatter.date);
+            const formattedDate = dateObj.getFullYear() + '-' +
+                String(dateObj.getMonth() + 1).padStart(2, '0') + '-' +
+                String(dateObj.getDate()).padStart(2, '0');
+
             lessonsData.push({
                 id: lessonsData.length + 1,
-                date: frontmatter.date,
+                date: formattedDate,
                 unit: frontmatter.unit,
                 title: `${frontmatter.subject}（${periodText}）`,
                 summary: `${frontmatter.unit}について学習しました。`,

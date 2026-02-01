@@ -64,6 +64,8 @@
                         href="#tools-section">学習ツール</a>
                     <a class="text-slate-600 hover:text-primary transition-colors text-sm font-medium"
                         href="#lessons-section">授業の記録</a>
+                    <a id="nav-history" class="text-slate-600 hover:text-primary transition-colors text-sm font-medium"
+                        href="javascript:void(0)">リアクション履歴</a>
                     <a id="nav-timetable"
                         class="text-slate-600 hover:text-primary transition-colors text-sm font-medium"
                         href="javascript:void(0)">自分の予定</a>
@@ -195,6 +197,28 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================
+             リアクション履歴ドロワー
+             ======================================== -->
+        <div id="history-drawer" class="overflow-hidden bg-white border-b border-slate-200"
+            style="height: 0; transition: height 0.4s ease-in-out;">
+            <div class="max-w-[1200px] mx-auto px-10 py-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-slate-800 text-xl font-bold">リアクションシートの履歴</h3>
+                        <p class="text-slate-500 text-sm">あなたが提出した内容の記録です（このブラウザのみ）</p>
+                    </div>
+                    <button onclick="document.getElementById('nav-history').click()"
+                        class="text-slate-400 hover:text-slate-600">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div id="history-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- JavaScriptで動的に挿入されます -->
                 </div>
             </div>
         </div>

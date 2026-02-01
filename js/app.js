@@ -221,67 +221,89 @@ document.addEventListener('DOMContentLoaded', () => {
             ToDo.init();
         }
 
-        // ドロワー制御の追加（改善版）
-        const navTimetable = document.getElementById('nav-timetable');
-        const timetableDrawer = document.getElementById('timetable-drawer');
+        // ドロワー制御の汎用関数
+        function setupDrawer(navId, drawerId) {
+            const nav = document.getElementById(navId);
+            const drawer = document.getElementById(drawerId);
+            if (!nav || !drawer) return;
 
-        if (navTimetable && timetableDrawer) {
             let isTransitioning = false;
 
-            navTimetable.addEventListener('click', (e) => {
+            nav.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (isTransitioning) return; // 連続クリック防止
+                if (isTransitioning) return;
 
-                const isOpen = timetableDrawer.classList.contains('is-open');
+                const isOpen = drawer.classList.contains('is-open');
 
                 if (!isOpen) {
-                    // 開く処理
-                    isTransitioning = true;
-                    timetableDrawer.classList.add('is-open');
-                    // 直接の子要素の高さを使用
-                    const contentHeight = timetableDrawer.firstElementChild.scrollHeight;
-                    timetableDrawer.style.height = contentHeight + 'px';
+                    // 他のドロワーを閉じる（オプション）
 
-                    // transitionend イベントで完了を検知
+                    // 履歴ドロワーの場合、開く直前にデータをロード
+                    if (drawerId === 'history-drawer') {
+                        renderHistory();
+                    }
+
+                    isTransitioning = true;
+                    drawer.classList.add('is-open');
+                    const contentHeight = drawer.firstElementChild.scrollHeight;
+                    drawer.style.height = contentHeight + 'px';
+
                     const handleTransitionEnd = () => {
-                        if (timetableDrawer.classList.contains('is-open')) {
-                            timetableDrawer.style.height = 'auto';
+                        if (drawer.classList.contains('is-open')) {
+                            drawer.style.height = 'auto';
                         }
                         isTransitioning = false;
-                        timetableDrawer.removeEventListener('transitionend', handleTransitionEnd);
+                        drawer.removeEventListener('transitionend', handleTransitionEnd);
                     };
-                    timetableDrawer.addEventListener('transitionend', handleTransitionEnd);
+                    drawer.addEventListener('transitionend', handleTransitionEnd);
                 } else {
-                    // 閉じる処理
                     isTransitioning = true;
-                    const contentHeight = timetableDrawer.firstElementChild.scrollHeight;
-                    timetableDrawer.style.height = contentHeight + 'px';
-                    timetableDrawer.offsetHeight; // リフロー強制
-                    timetableDrawer.classList.remove('is-open');
-                    timetableDrawer.style.height = '0px';
+                    const contentHeight = drawer.firstElementChild.scrollHeight;
+                    drawer.style.height = contentHeight + 'px';
+                    drawer.offsetHeight;
+                    drawer.classList.remove('is-open');
+                    drawer.style.height = '0px';
 
                     const handleTransitionEnd = () => {
                         isTransitioning = false;
-                        timetableDrawer.removeEventListener('transitionend', handleTransitionEnd);
+                        drawer.removeEventListener('transitionend', handleTransitionEnd);
                     };
-                    timetableDrawer.addEventListener('transitionend', handleTransitionEnd);
+                    drawer.addEventListener('transitionend', handleTransitionEnd);
                 }
             });
 
-            // 内部要素の変化を検知して高さを再計算（編集パネルの開閉時など）
             const resizeObserver = new ResizeObserver(() => {
-                if (timetableDrawer.classList.contains('is-open') &&
-                    timetableDrawer.style.height === 'auto') {
-                    // autoの場合のみ、高さを再計算する必要はない（自動調整される）
-                    return;
-                }
-                if (timetableDrawer.classList.contains('is-open') && !isTransitioning) {
-                    const contentHeight = timetableDrawer.firstElementChild.scrollHeight;
-                    timetableDrawer.style.height = contentHeight + 'px';
+                if (drawer.classList.contains('is-open') && drawer.style.height !== '0px' && drawer.style.height !== 'auto' && !isTransitioning) {
+                    const contentHeight = drawer.firstElementChild.scrollHeight;
+                    drawer.style.height = contentHeight + 'px';
                 }
             });
-            resizeObserver.observe(timetableDrawer.firstElementChild);
+            resizeObserver.observe(drawer.firstElementChild);
         }
+
+        // リアクション履歴の描画
+        function renderHistory() {
+            const container = document.getElementById('history-content');
+            if (!container) return;
+
+            const history = JSON.parse(localStorage.getItem('lesson_submissions') || '[]');
+
+            if (history.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-20 text-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400">
+                        <span class="material-symbols-outlined text-4xl mb-2">history</span>
+                        <p>提出済みのリアクションシートはまだありません。</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = history.map(item => Templates.historyCard(item)).join('');
+        }
+
+        // 各ドロワーのセットアップ
+        setupDrawer('nav-timetable', 'timetable-drawer');
+        setupDrawer('nav-history', 'history-drawer');
     }
 
     init();
