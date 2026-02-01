@@ -845,13 +845,24 @@ function generateHTML(data, htmlContent) {
             const status = document.getElementById('formStatus');
             const formData = new FormData(e.target);
 
+            const now = new Date();
+            const timestamp = now.getFullYear() + '-' + 
+                             String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                             String(now.getDate()).padStart(2, '0') + ' ' + 
+                             String(now.getHours()).padStart(2, '0') + ':' + 
+                             String(now.getMinutes()).padStart(2, '0') + ':' + 
+                             String(now.getSeconds()).padStart(2, '0');
+
             const data = {
                 number: formData.get('number'),
-            lesson: formData.get('lesson'),
-            summary: formData.get('summary'),
-            questions: formData.get('questions'),
-            timestamp: new Date().toLocaleString()
+                lesson: formData.get('lesson'),
+                summary: formData.get('summary'),
+                questions: formData.get('questions'),
+                timestamp: timestamp
             };
+
+            // GAS送信用のデータにもタイムスタンプを追加
+            formData.append('timestamp', timestamp);
 
             // ローカルストレージに一旦保存
             saveSubmissionLocal(data);
