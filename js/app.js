@@ -131,34 +131,80 @@ document.addEventListener('DOMContentLoaded', () => {
     function initThemeCustomization() {
         const hero = document.getElementById('hero-section');
         const colorGrid = document.getElementById('theme-color-grid');
+        const gradientGrid = document.getElementById('theme-gradient-grid');
+        const triviaSelect = document.getElementById('theme-trivia-category');
         const imageUpload = document.getElementById('theme-image-upload');
         const resetBtn = document.getElementById('theme-reset');
-        if (!hero || !colorGrid) return;
+        if (!hero) return;
 
-        const presets = [
-            'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-            '#1e293b', '#dc2626', '#ea580c', '#ca8a04',
-            '#16a34a', '#0891b2', '#2563eb', '#9333ea', '#db2777',
-            'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
-            'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-            'linear-gradient(135deg, #e11d48 0%, #fb7185 100%)',
-            'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
-            'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
-            'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
-            '#171717', '#3f6212', '#1e40af', '#701a75'
+        // カラープリセット（40色 - 色相環順にバランスよく配置）
+        const solidPresets = [
+            '#0f172a', '#1e293b', '#334155', '#475569', '#64748b', // Slate/Gray
+            '#450a0a', '#991b1b', '#dc2626', '#f87171', '#fecaca', // Red
+            '#431407', '#9a3412', '#ea580c', '#fb923c', '#ffedd5', // Orange
+            '#3f2f06', '#854d0e', '#ca8a04', '#facc15', '#fef9c3', // Amber/Yellow
+            '#064e3b', '#047857', '#10b981', '#6ee7b7', '#d1fae5', // Emerald/Green
+            '#164e63', '#0891b2', '#22d3ee', '#a5f3fc', '#ecfeff', // Cyan
+            '#172554', '#1e40af', '#2563eb', '#60a5fa', '#dbeafe', // Blue
+            '#312e81', '#4338ca', '#6366f1', '#a5b4fc', '#e0e7ff', // Indigo
+            '#4c1d95', '#6d28d9', '#8b5cf6', '#c4b5fd', '#ede9fe', // Violet
+            '#701a75', '#be185d', '#db2777', '#f472b6', '#fce7f3'  // Pink
         ];
 
-        presets.forEach(color => {
-            const btn = document.createElement('button');
-            btn.className = 'size-8 rounded-full border-2 border-white shadow-sm hover:scale-110 transition-transform cursor-pointer';
-            btn.style.background = color;
-            btn.onclick = () => {
-                hero.style.backgroundImage = 'none';
-                hero.style.background = color;
-                localStorage.setItem('portal_theme', JSON.stringify({ type: 'color', value: color }));
+        // グラデーションプリセット（20色 - 色相順かつ視認性の高いペア）
+        const gradientPresets = [
+            'linear-gradient(135deg, #0f172a 0%, #334155 100%)', // Dark Slate
+            'linear-gradient(135deg, #450a0a 0%, #991b1b 100%)', // Deep Red
+            'linear-gradient(135deg, #dc2626 0%, #f43f5e 100%)', // Vibrant Red
+            'linear-gradient(135deg, #ea580c 0%, #f97316 100%)', // Bright Orange
+            'linear-gradient(135deg, #f59e0b 0%, #facc15 100%)', // Golden Amber
+            'linear-gradient(135deg, #65a30d 0%, #a3e635 100%)', // Lime Punch
+            'linear-gradient(135deg, #059669 0%, #10b981 100%)', // Emerald Green
+            'linear-gradient(135deg, #0d9488 0%, #2dd4bf 100%)', // Teal Wave
+            'linear-gradient(135deg, #0891b2 0%, #22d3ee 100%)', // Cyan Sky
+            'linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)', // Sky Blue
+            'linear-gradient(135deg, #2563eb 0%, #60a5fa 100%)', // Royal Blue
+            'linear-gradient(135deg, #4f46e5 0%, #818cf8 100%)', // Indigo Glow
+            'linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)', // Violet Magic
+            'linear-gradient(135deg, #9333ea 0%, #c084fc 100%)', // Purple Haze
+            'linear-gradient(135deg, #c026d3 0%, #e879f9 100%)', // Fuchsia
+            'linear-gradient(135deg, #db2777 0%, #f472b6 100%)', // Pink Glam
+            'linear-gradient(135deg, #e11d48 0%, #fb7185 100%)', // Rose Petal
+            'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', // Sunset
+            'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)', // Cosmic
+            'linear-gradient(135deg, #312e81 0%, #4c1d95 100%)'  // Midnight
+        ];
+
+        const applyTheme = (value) => {
+            hero.style.backgroundImage = 'none';
+            hero.style.background = value;
+            localStorage.setItem('portal_theme', JSON.stringify({ type: 'color', value }));
+        };
+
+        const renderPresets = (presets, container) => {
+            if (!container) return;
+            container.innerHTML = '';
+            presets.forEach(color => {
+                const btn = document.createElement('button');
+                btn.className = 'size-8 rounded-full border-2 border-white shadow-sm hover:scale-110 transition-transform cursor-pointer';
+                btn.style.background = color;
+                btn.onclick = () => applyTheme(color);
+                container.appendChild(btn);
+            });
+        };
+
+        renderPresets(solidPresets, colorGrid);
+        renderPresets(gradientPresets, gradientGrid);
+
+        // 雑学カテゴリ設定
+        if (triviaSelect) {
+            const savedCategory = localStorage.getItem('portal_trivia_category') || 'all';
+            triviaSelect.value = savedCategory;
+            triviaSelect.onchange = (e) => {
+                localStorage.setItem('portal_trivia_category', e.target.value);
+                if (typeof initHeroTrivia === 'function') initHeroTrivia();
             };
-            colorGrid.appendChild(btn);
-        });
+        }
 
         imageUpload.onchange = (e) => {
             const file = e.target.files[0];
@@ -176,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resetBtn.onclick = () => {
             hero.style.backgroundImage = 'none';
-            hero.style.background = presets[0];
+            hero.style.background = gradientPresets[0];
             localStorage.removeItem('portal_theme');
         };
 
@@ -228,7 +274,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         container.innerHTML = filtered.map(item => {
-            const lesson = state.allLessons.find(l => l.title.includes(item.lesson) || item.lesson.includes(l.title));
+            // マッチングルールの改善: 
+            // 1. カッコやハイフン以降を無視して基本名で比較
+            // 2. 相互の部分一致をチェック
+            const cleanTitle = (t) => t.split(/[（( \-－]/)[0].trim().toLowerCase();
+            const itemBase = cleanTitle(item.lesson);
+
+            const lesson = state.allLessons.find(l => {
+                const masterBase = cleanTitle(l.title);
+                const isMatch = itemBase.includes(masterBase) || masterBase.includes(itemBase) ||
+                    item.lesson.includes(l.title) || l.title.includes(item.lesson);
+                return isMatch;
+            });
             return Templates.historyCard(item, lesson ? lesson.url : '#');
         }).join('');
     }
@@ -236,6 +293,57 @@ document.addEventListener('DOMContentLoaded', () => {
     // ========================================
     // Data Loading
     // ========================================
+    async function initHeroTrivia() {
+        const heroTitle = document.getElementById('hero-title');
+        if (!heroTitle) return;
+
+        try {
+            const response = await fetch(CONFIG.dataPaths.trivia);
+            if (!response.ok) throw new Error('Trivia fetch failed');
+
+            const csvText = await response.text();
+            const rows = csvText.trim().split('\n').map(row => row.split(','));
+
+            const triviaList = rows.slice(1)
+                .filter(row => row.length >= 3)
+                .map(row => ({
+                    theme: row[0].trim(),
+                    content: row[1].trim(),
+                    description: row[2].trim()
+                }));
+
+            // カテゴリ選択肢の初期化（一度だけ）
+            const triviaSelect = document.getElementById('theme-trivia-category');
+            if (triviaSelect && triviaSelect.options.length === 1 && triviaList.length > 0) {
+                const themes = [...new Set(triviaList.map(t => t.theme))];
+                themes.forEach(theme => {
+                    const opt = document.createElement('option');
+                    opt.value = theme;
+                    opt.textContent = theme;
+                    triviaSelect.appendChild(opt);
+                });
+                triviaSelect.value = localStorage.getItem('portal_trivia_category') || 'all';
+            }
+
+            const activeCategory = localStorage.getItem('portal_trivia_category') || 'all';
+            const filteredTrivia = activeCategory === 'all' ? triviaList : triviaList.filter(t => t.theme === activeCategory);
+
+            if (filteredTrivia.length > 0) {
+                const randomItem = filteredTrivia[Math.floor(Math.random() * filteredTrivia.length)];
+                heroTitle.textContent = randomItem.content;
+
+                // 解説文を表示（hero-subtitleがあれば）
+                const heroSubtitle = document.getElementById('hero-subtitle');
+                if (heroSubtitle) {
+                    heroSubtitle.textContent = randomItem.description || 'このサイトは授業の資料、便利な学習ツール、過去の授業記録をまとめたクラス専用ポータルです。';
+                    heroSubtitle.classList.add('opacity-80');
+                }
+            }
+        } catch (error) {
+            console.error('Trivia error:', error);
+        }
+    }
+
     async function fetchData() {
         try {
             const [lessonsRes, toolsRes] = await Promise.all([
@@ -268,9 +376,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        const refreshBtn = document.getElementById('refresh-trivia');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => initHeroTrivia());
+        }
+
         if (typeof Timetable !== 'undefined') Timetable.init();
         if (typeof ToDo !== 'undefined') ToDo.init();
-        if (typeof initHeroTrivia !== 'undefined') initHeroTrivia();
+        if (typeof initHeroTrivia === 'function') initHeroTrivia();
     }
 
     init();

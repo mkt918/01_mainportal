@@ -72,12 +72,6 @@
                             class="text-slate-600 hover:text-primary transition-colors text-sm font-medium"
                             href="javascript:void(0)">リアクション履歴</a>
                     </nav>
-                    <button id="nav-theme"
-                        class="flex size-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all shadow-sm group"
-                        title="背景カスタマイズ">
-                        <span
-                            class="material-symbols-outlined transition-transform group-hover:rotate-45">settings</span>
-                    </button>
                 </div>
             </div>
         </header>
@@ -100,11 +94,35 @@
                     <div>
                         <div class="flex items-center gap-2 mb-4">
                             <span class="material-symbols-outlined text-sm text-primary">palette</span>
-                            <span class="text-sm font-bold text-slate-700">カラープリセット</span>
+                            <span class="text-sm font-bold text-slate-700">カラープリセット (ソリッド)</span>
                         </div>
                         <div id="theme-color-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-3">
                             <!-- JSで挿入 -->
                         </div>
+                    </div>
+
+                    <!-- グラデーションプリセット -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="material-symbols-outlined text-sm text-primary">gradient</span>
+                            <span class="text-sm font-bold text-slate-700">グラデーションプリセット</span>
+                        </div>
+                        <div id="theme-gradient-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-3">
+                            <!-- JSで挿入 -->
+                        </div>
+                    </div>
+
+                    <!-- 雑学カテゴリ設定 -->
+                    <div class="border-t border-slate-200 pt-8">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="material-symbols-outlined text-sm text-primary">auto_stories</span>
+                            <span class="text-sm font-bold text-slate-700">今日の雑学カテゴリ</span>
+                        </div>
+                        <select id="theme-trivia-category"
+                            class="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm font-medium text-slate-700 focus:border-primary outline-none transition-all cursor-pointer">
+                            <option value="all">すべて表示</option>
+                            <!-- JSでカテゴリを動的に追加 -->
+                        </select>
                     </div>
 
                     <!-- 画像アップロード -->
@@ -297,14 +315,29 @@
                  ヒーローセクション
                  ======================================== -->
             <section id="hero-section"
-                class="w-full py-24 px-10 relative overflow-hidden bg-primary flex flex-col items-center text-center gap-8 transition-all duration-700 bg-cover bg-center">
+                class="w-full mt-12 py-24 px-10 relative overflow-hidden bg-primary flex flex-col items-center text-center gap-8 transition-all duration-700 bg-cover bg-center shadow-lg">
+                <div class="absolute top-6 right-8 flex items-center gap-3 z-20">
+                    <button id="refresh-trivia"
+                        class="flex size-10 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 backdrop-blur-md transition-all shadow-sm group border border-white/20"
+                        title="次の雑学">
+                        <span
+                            class="material-symbols-outlined transition-transform group-hover:rotate-180">refresh</span>
+                    </button>
+                    <button id="nav-theme"
+                        class="flex size-10 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 backdrop-blur-md transition-all shadow-sm group border border-white/20"
+                        title="背景カスタマイズ">
+                        <span
+                            class="material-symbols-outlined transition-transform group-hover:rotate-45">settings</span>
+                    </button>
+                </div>
+
                 <div class="flex flex-col gap-6 z-10">
                     <span class="text-blue-100 font-mono text-sm tracking-widest uppercase">今日の雑学</span>
                     <h1 id="hero-title"
                         class="text-white text-4xl md:text-7xl font-black leading-tight tracking-[-0.033em]">
                         学びを、もっと <span class="text-yellow-300">クリエイティブ</span> に。
                     </h1>
-                    <p class="text-blue-100 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                    <p id="hero-subtitle" class="text-blue-100 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
                         このサイトは授業の資料、便利な学習ツール、過去の授業記録をまとめたクラス専用ポータルです。
                     </p>
                 </div>
