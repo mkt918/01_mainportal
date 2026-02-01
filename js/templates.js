@@ -66,35 +66,34 @@ const Templates = {
     },
 
     /**
-     * 授業カードのHTMLを生成
+     * 授業カードのHTMLを生成 (グリッド表示・コンパクト版)
      * @param {Object} lesson - 授業データ
      * @returns {string} HTML文字列
      */
     lessonCard(lesson) {
         const tagsHtml = lesson.tags
-            .map(tag => `<span class="text-[10px] text-slate-400">#${this.escapeHtml(tag)}</span>`)
-            .join('');
+            .map(tag => `<span class="text-[10px] text-slate-400 font-medium">#${this.escapeHtml(tag)}</span>`)
+            .join(' ');
 
         return `
-            <div class="relative flex flex-col md:flex-row items-center gap-8 group lesson-item" data-tags="${this.escapeHtml(lesson.tags.join(','))}">
-                <div class="hidden md:block absolute left-0 md:left-1/2 size-4 bg-primary rounded-full transform md:-translate-x-1/2 shadow-lg shadow-primary/30 z-10"></div>
-                <div class="w-full md:w-[45%] glass-card p-6 rounded-xl group-hover:shadow-lg transition-all ml-0 md:ml-auto">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-2 text-primary text-xs font-bold">
-                            <span class="material-symbols-outlined text-sm">calendar_month</span> ${this.escapeHtml(lesson.date)}
-                        </div>
-                        <span class="text-slate-500 text-[10px] bg-slate-100 px-2 py-0.5 rounded font-medium">${this.escapeHtml(lesson.unit)}</span>
+            <div class="flex flex-col bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group lesson-item" data-tags="${this.escapeHtml(lesson.tags.join(','))}">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-1.5 text-primary text-[10px] font-bold">
+                        <span class="material-symbols-outlined text-sm">calendar_month</span> ${this.escapeHtml(lesson.date)}
                     </div>
-                    <h4 class="text-slate-800 text-lg font-bold mb-3">${this.escapeHtml(lesson.title)}</h4>
-                    <p class="text-slate-500 text-sm mb-4">${this.escapeHtml(lesson.summary)}</p>
-                    <div class="flex items-center justify-between">
-                        <div class="flex gap-2">${tagsHtml}</div>
-                        <a class="text-primary text-sm font-medium hover:underline inline-flex items-center gap-1" href="${this.escapeHtml(lesson.url)}">
-                            ${CONFIG.labels.viewMaterial} <span class="material-symbols-outlined text-xs">open_in_new</span>
-                        </a>
-                    </div>
+                    <span class="text-slate-400 text-[9px] bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100 font-bold uppercase tracking-wider">${this.escapeHtml(lesson.unit)}</span>
                 </div>
-                <div class="hidden md:block w-1/2"></div>
+                
+                <h4 class="text-slate-800 text-sm font-bold mb-3 leading-snug line-clamp-2 min-h-[2.5rem]">
+                    ${this.escapeHtml(lesson.title)}
+                </h4>
+                
+                <div class="mt-auto pt-3 border-t border-slate-50 flex items-center justify-between">
+                    <div class="flex flex-wrap gap-x-2 gap-y-1">${tagsHtml}</div>
+                    <a class="text-primary hover:text-primary-dark transition-colors" href="${this.escapeHtml(lesson.url)}" title="${CONFIG.labels.viewMaterial}">
+                        <span class="material-symbols-outlined text-lg">open_in_new</span>
+                    </a>
+                </div>
             </div>
         `;
     },
