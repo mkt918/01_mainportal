@@ -986,13 +986,17 @@ function main() {
             fs.writeFileSync(outputPath, fullHTML, 'utf-8');
 
             // lessons.json用のデータを追加
+            const periodText = frontmatter.period.toString().includes('限')
+                ? frontmatter.period
+                : `${frontmatter.period}限`;
+
             lessonsData.push({
                 id: lessonsData.length + 1,
                 date: frontmatter.date,
                 unit: frontmatter.unit,
-                title: `${frontmatter.subject}（${frontmatter.period}限）`,
+                title: `${frontmatter.subject}（${periodText}）`,
                 summary: `${frontmatter.unit}について学習しました。`,
-                tags: [frontmatter.subject, `${frontmatter.period}限`],
+                tags: [frontmatter.subject, periodText],
                 readTime: '10分',
                 url: `note/${filename}/index.html`
             });

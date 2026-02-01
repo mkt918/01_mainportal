@@ -35,10 +35,17 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     async function fetchData() {
         try {
+            console.log('📊 データ取得を開始します...');
+            console.log('Lessons path:', CONFIG.dataPaths.lessons);
+            console.log('Tools path:', CONFIG.dataPaths.tools);
+
             const [lessonsRes, toolsRes] = await Promise.all([
                 fetch(CONFIG.dataPaths.lessons),
                 fetch(CONFIG.dataPaths.tools)
             ]);
+
+            console.log('Lessons response status:', lessonsRes.status);
+            console.log('Tools response status:', toolsRes.status);
 
             if (!lessonsRes.ok || !toolsRes.ok) {
                 throw new Error('Failed to fetch data');
@@ -47,9 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
             state.allLessons = await lessonsRes.json();
             state.allTools = await toolsRes.json();
 
+            console.log('✅ データ取得成功:', state.allLessons.length, '件の授業記録');
+            console.log('✅ ツール取得成功:', state.allTools.length, '件のツール');
+
             renderAll();
         } catch (error) {
-            console.error('データの取得に失敗しました:', error);
+            console.error('❌ データの取得に失敗しました:', error);
             showError('データの読み込みに失敗しました。ページを再読み込みしてください。');
         }
     }
