@@ -257,6 +257,7 @@ function convertToTabStructure(htmlContent) {
                             placeholder="疑問点やもっと詳しく知りたいことがあれば記入してください"></textarea>
                     </div>
                     <div class="flex flex-col gap-4">
+                        <input type="hidden" id="timestamp" name="timestamp">
                         <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 active:translate-y-0 disabled:opacity-50">
                             この内容で送信する
                         </button>
@@ -853,16 +854,20 @@ function generateHTML(data, htmlContent) {
                              String(now.getMinutes()).padStart(2, '0') + ':' + 
                              String(now.getSeconds()).padStart(2, '0');
 
+            // 隠しフィールドにタイムスタンプをセット
+            const timestampInput = e.target.querySelector('#timestamp');
+            if (timestampInput) timestampInput.value = timestamp;
+
+            // フォームデータを再度取得（隠しフィールドを含めるため）
+            const finalFormData = new FormData(e.target);
+
             const data = {
-                number: formData.get('number'),
-                lesson: formData.get('lesson'),
-                summary: formData.get('summary'),
-                questions: formData.get('questions'),
+                number: finalFormData.get('number'),
+                lesson: finalFormData.get('lesson'),
+                summary: finalFormData.get('summary'),
+                questions: finalFormData.get('questions'),
                 timestamp: timestamp
             };
-
-            // GAS送信用のデータにもタイムスタンプを追加
-            formData.append('timestamp', timestamp);
 
             // ローカルストレージに一旦保存
             saveSubmissionLocal(data);
@@ -876,7 +881,7 @@ function generateHTML(data, htmlContent) {
                 await fetch(GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors', // GAS WebAppのための設定
-                    body: new URLSearchParams(formData)
+                    body: new URLSearchParams(finalFormData)
                 });
 
             status.className = 'text-center p-3 rounded-lg font-medium bg-green-50 text-green-600 block';
