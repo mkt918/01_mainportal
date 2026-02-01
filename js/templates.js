@@ -2,7 +2,9 @@
  * HTMLテンプレート生成関数（ライトモード対応版）
  * UIコンポーネントのHTMLを一元管理し、再利用性を高める
  */
-const Templates = {
+import { CONFIG } from './config.js';
+
+export const Templates = {
     /**
      * ツールカードのHTMLを生成
      * @param {Object} tool - ツールデータ

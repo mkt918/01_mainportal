@@ -2,7 +2,9 @@
  * ToDoリスト機能モジュール
  * 重要(5個)・通常(15個)の2カラム構成、ドラッグ＆ドロップ対応
  */
-const ToDo = {
+import { Templates } from './templates.js';
+
+export const ToDo = {
     STORAGE_KEY: 'class_portal_todo',
 
     state: {

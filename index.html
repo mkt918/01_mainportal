@@ -8,6 +8,7 @@
     <title>クラスポータル - 学習支援サイト</title>
 
     <!-- External Styles -->
+    <!-- 注意: Tailwind CDNは開発用です。本番環境では PostCSS でビルドして最適化したCSSを使用してください。 -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
@@ -424,12 +425,8 @@
 
     </div>
 
-    <!-- Scripts (順序が重要: config → templates → timetable → todo → app) -->
-    <script src="js/config.js"></script>
-    <script src="js/templates.js"></script>
-    <script src="js/timetable.js"></script>
-    <script src="js/todo.js"></script>
-    <script src="js/app.js"></script>
+    <!-- Scripts (ES Modules化により依存関係は各ファイル内で管理) -->
+    <script type="module" src="js/app.js"></script>
 </body>
 
 </html>

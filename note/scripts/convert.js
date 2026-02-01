@@ -309,6 +309,19 @@ ${remainingContent.trim()}`;
 
 
 /**
+ * XSS対策: HTMLエスケープ（サーバー側でも使用）
+ */
+function escapeHtmlForTemplate(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+}
+
+/**
  * HTMLテンプレートを生成（モダンデザイン版）
  */
 function generateHTML(data, htmlContent) {
@@ -321,12 +334,19 @@ function generateHTML(data, htmlContent) {
     // 限の重複防止
     const periodText = data.period.toString().includes('限') ? data.period : `${data.period}限`;
 
+    // frontmatterデータをエスケープ
+    const escapedSubject = escapeHtmlForTemplate(data.subject);
+    const escapedUnit = escapeHtmlForTemplate(data.unit);
+    const escapedPeriodText = escapeHtmlForTemplate(periodText);
+    const escapedFormattedDate = escapeHtmlForTemplate(formattedDate);
+
     return `<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${data.subject} - ${data.unit}</title>
+    <title>${escapedSubject} - ${escapedUnit}</title>
+    <!-- 注意: Tailwind CDNは開発用です。本番環境では PostCSS でビルドして最適化したCSSを使用してください。 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
@@ -670,8 +690,8 @@ function generateHTML(data, htmlContent) {
             color: #94a3b8;
             margin-bottom: 4px;
         }
-    </style >
-</head >
+    </style>
+</head>
     <body class="font-sans p-4 md:p-8">
         <div class="max-w-4xl mx-auto">
             <a href="../../index.html" class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium mb-6 transition-colors">
@@ -683,12 +703,12 @@ function generateHTML(data, htmlContent) {
         <div class="section-card mb-8">
             <div class="flex items-center gap-3 text-slate-500 text-sm mb-3">
                 <span class="material-symbols-outlined text-lg">calendar_month</span>
-                <span>${formattedDate}</span>
+                <span>${escapedFormattedDate}</span>
                 <span class="mx-1">|</span>
-                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">${periodText}</span>
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">${escapedPeriodText}</span>
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">${data.subject}</h1>
-            <p class="text-xl text-slate-600">${data.unit}</p>
+            <h1 class="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">${escapedSubject}</h1>
+            <p class="text-xl text-slate-600">${escapedUnit}</p>
         </div>
 
             <!-- メインコンテンツ -->
@@ -907,6 +927,13 @@ function generateHTML(data, htmlContent) {
             localStorage.setItem('lesson_submissions', JSON.stringify(history.slice(0, 10))); // 直近10件
         }
 
+            function escapeHtml(str) {
+                if (str == null) return '';
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
             function loadSubmissionHistory() {
             const container = document.getElementById('submissionHistory');
             if (!container) return;
@@ -919,10 +946,10 @@ function generateHTML(data, htmlContent) {
 
             container.innerHTML = history.map(item =>
             '<div class="history-card">' +
-                '<div class="history-date">' + item.timestamp + '</div>' +
-                '<div class="font-bold text-indigo-600 mb-1">' + item.lesson + '</div>' +
-                '<div class="text-slate-700 whitespace-pre-wrap"><span class="font-bold">まとめ:</span> ' + item.summary + '</div>' +
-                (item.questions ? '<div class="text-slate-600 mt-2 text-sm italic"><span class="font-bold">？:</span> ' + item.questions + '</div>' : '') +
+                '<div class="history-date">' + escapeHtml(item.timestamp) + '</div>' +
+                '<div class="font-bold text-indigo-600 mb-1">' + escapeHtml(item.lesson) + '</div>' +
+                '<div class="text-slate-700 whitespace-pre-wrap"><span class="font-bold">まとめ:</span> ' + escapeHtml(item.summary) + '</div>' +
+                (item.questions ? '<div class="text-slate-600 mt-2 text-sm italic"><span class="font-bold">？:</span> ' + escapeHtml(item.questions) + '</div>' : '') +
                 '</div>'
             ).join('');
         }

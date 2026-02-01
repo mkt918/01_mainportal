@@ -2,7 +2,9 @@
  * 時間割機能モジュール
  * デザインと操作性を刷新
  */
-const Timetable = {
+import { Templates } from './templates.js';
+
+export const Timetable = {
     STORAGE_KEY: 'class_portal_timetable',
 
     // カラーテンプレート（10色のプリセット）
@@ -19,7 +21,12 @@ const Timetable = {
         '#ecfdf5'  // エメラルド
     ],
 
-    defaultData: Array(6).fill(null).map(() => Array(5).fill({ subject: '', teacher: '', color: '' })),
+    // デフォルトデータを生成する関数（オブジェクト参照共有を防止）
+    getDefaultData() {
+        return Array(6).fill(null).map(() =>
+            Array(5).fill(null).map(() => ({ subject: '', teacher: '', color: '' }))
+        );
+    },
 
     state: {
         data: [],
@@ -50,11 +57,11 @@ const Timetable = {
                     throw new Error('Invalid data structure');
                 }
             } else {
-                this.state.data = JSON.parse(JSON.stringify(this.defaultData));
+                this.state.data = this.getDefaultData();
             }
         } catch (error) {
             console.error('時間割データの読み込みに失敗しました:', error);
-            this.state.data = JSON.parse(JSON.stringify(this.defaultData));
+            this.state.data = this.getDefaultData();
             this.saveData(); // 破損データを初期化して保存
         }
     },

@@ -1,6 +1,11 @@
 /**
  * クラスポータル - メインアプリケーション
  */
+import { CONFIG } from './config.js';
+import { Templates } from './templates.js';
+import { Timetable } from './timetable.js';
+import { ToDo } from './todo.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     // ========================================
     // State
@@ -226,19 +231,26 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('portal_theme');
         };
 
-        const savedTheme = JSON.parse(localStorage.getItem('portal_theme'));
-        if (savedTheme) {
-            if (savedTheme.type === 'color') hero.style.background = savedTheme.value;
-            else if (savedTheme.type === 'image') {
-                hero.style.backgroundImage = `url(${savedTheme.value})`;
-                hero.style.backgroundColor = 'black';
+        try {
+            const savedTheme = JSON.parse(localStorage.getItem('portal_theme'));
+            if (savedTheme) {
+                if (savedTheme.type === 'color') hero.style.background = savedTheme.value;
+                else if (savedTheme.type === 'image') {
+                    hero.style.backgroundImage = `url(${savedTheme.value})`;
+                    hero.style.backgroundColor = 'black';
+                }
             }
+        } catch (error) {
+            console.error('テーマデータの読み込みに失敗しました:', error);
+            localStorage.removeItem('portal_theme');
         }
     }
 
     // ========================================
     // History
     // ========================================
+    let historyListenersInitialized = false;
+
     function renderHistory() {
         const container = document.getElementById('history-content');
         const monthFilter = document.getElementById('history-month-filter');
@@ -251,7 +263,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (monthFilter && monthFilter.options.length === 1) {
+        // イベントリスナーの初期化（一度だけ）
+        if (!historyListenersInitialized && monthFilter && searchInput) {
             const months = [...new Set(allHistory.map(item => item.timestamp.split(' ')[0].substring(0, 7)))].sort().reverse();
             months.forEach(m => {
                 const opt = document.createElement('option');
@@ -261,6 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             monthFilter.addEventListener('change', renderHistory);
             searchInput.addEventListener('input', renderHistory);
+            historyListenersInitialized = true;
         }
 
         const activeMonth = monthFilter?.value || 'all';
@@ -293,6 +307,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // ========================================
     // Data Loading
     // ========================================
+    /**
+     * 簡易CSVパーサー（ダブルクォート内のカンマをエスケープ）
+     */
+    function parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(current);
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current);
+        return result;
+    }
+
     async function initHeroTrivia() {
         const heroTitle = document.getElementById('hero-title');
         if (!heroTitle) return;
@@ -302,7 +340,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Trivia fetch failed');
 
             const csvText = await response.text();
-            const rows = csvText.trim().split('\n').map(row => row.split(','));
+            const lines = csvText.trim().split('\n');
+            const rows = lines.map(line => parseCSVLine(line));
 
             const triviaList = rows.slice(1)
                 .filter(row => row.length >= 3)
