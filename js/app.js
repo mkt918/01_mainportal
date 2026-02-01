@@ -304,6 +304,67 @@ document.addEventListener('DOMContentLoaded', () => {
         // 各ドロワーのセットアップ
         setupDrawer('nav-timetable', 'timetable-drawer');
         setupDrawer('nav-history', 'history-drawer');
+
+        // リアクション履歴の描画とフィルタリング
+        function renderHistory() {
+            const container = document.getElementById('history-content');
+            const monthFilter = document.getElementById('history-month-filter');
+            const searchInput = document.getElementById('history-search');
+            if (!container) return;
+
+            const allHistory = JSON.parse(localStorage.getItem('lesson_submissions') || '[]');
+
+            // フィルタの選択肢を初期化（初回のみ）
+            if (monthFilter && monthFilter.options.length === 1) {
+                const months = [...new Set(allHistory.map(item => {
+                    const date = item.timestamp.split(' ')[0]; // yyyy-mm-dd
+                    return date.substring(0, 7); // yyyy-mm
+                }))].sort().reverse();
+
+                months.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.textContent = m.replace('-', '年 ') + '月';
+                    monthFilter.appendChild(opt);
+                });
+
+                // イベントリスナー登録
+                monthFilter.addEventListener('change', renderHistory);
+                searchInput.addEventListener('input', renderHistory);
+            }
+
+            const activeMonth = monthFilter ? monthFilter.value : 'all';
+            const searchQuery = searchInput ? searchInput.value.toLowerCase() : '';
+
+            const filteredHistory = allHistory.filter(item => {
+                const date = item.timestamp.split(' ')[0];
+                const month = date.substring(0, 7);
+                const matchesMonth = activeMonth === 'all' || month === activeMonth;
+                const matchesSearch = item.lesson.toLowerCase().includes(searchQuery) ||
+                    item.summary.toLowerCase().includes(searchQuery);
+                return matchesMonth && matchesSearch;
+            });
+
+            if (filteredHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center bg-white/50 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400">
+                        <span class="material-symbols-outlined text-4xl mb-2">search_off</span>
+                        <p class="text-sm font-medium">該当する履歴が見つかりませんでした。</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // lessonUrl の紐付け（allLessons から検索）
+            container.innerHTML = filteredHistory.map(item => {
+                const lesson = state.allLessons.find(l => {
+                    // 授業名が一致するか、日付と科目が含まれるか（柔軟なマッチング）
+                    return l.title.includes(item.lesson) || item.lesson.includes(l.title);
+                });
+                const url = lesson ? lesson.url : '#';
+                return Templates.historyCard(item, url);
+            }).join('');
+        }
     }
 
     init();

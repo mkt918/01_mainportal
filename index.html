@@ -204,20 +204,35 @@
         <!-- ========================================
              リアクション履歴ドロワー
              ======================================== -->
-        <div id="history-drawer" class="overflow-hidden bg-white border-b border-slate-200"
+        <div id="history-drawer" class="overflow-hidden bg-slate-50/50 border-b border-slate-200"
             style="height: 0; transition: height 0.4s ease-in-out;">
-            <div class="max-w-[1200px] mx-auto px-10 py-8">
-                <div class="flex items-center justify-between mb-6">
+            <div class="max-w-[1200px] mx-auto px-10 py-10">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
                     <div>
-                        <h3 class="text-slate-800 text-xl font-bold">リアクションシートの履歴</h3>
-                        <p class="text-slate-500 text-sm">あなたが提出した内容の記録です（このブラウザのみ）</p>
+                        <h3 class="text-slate-800 text-2xl font-black tracking-tight mb-2">My Reaction Sheets</h3>
+                        <p class="text-slate-500 text-sm font-medium">これまでの授業の振り返り（ブラウザ保存分）</p>
                     </div>
-                    <button onclick="document.getElementById('nav-history').click()"
-                        class="text-slate-400 hover:text-slate-600">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
+
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="relative min-w-[150px]">
+                            <select id="history-month-filter"
+                                class="w-full appearance-none bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm font-bold text-slate-700 focus:border-primary outline-none transition-all cursor-pointer">
+                                <option value="all">すべての月</option>
+                            </select>
+                            <span
+                                class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+                        </div>
+                        <div class="relative min-w-[200px]">
+                            <span
+                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                            <input type="text" id="history-search" placeholder="授業名で検索..."
+                                class="w-full bg-white border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm font-medium text-slate-700 focus:border-primary outline-none transition-all">
+                        </div>
+                    </div>
                 </div>
-                <div id="history-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <div id="history-content"
+                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     <!-- JavaScriptで動的に挿入されます -->
                 </div>
             </div>
