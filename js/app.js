@@ -238,7 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 開く処理
                     isTransitioning = true;
                     timetableDrawer.classList.add('is-open');
-                    timetableDrawer.style.height = timetableDrawer.scrollHeight + 'px';
+                    // 直接の子要素の高さを使用
+                    const contentHeight = timetableDrawer.firstElementChild.scrollHeight;
+                    timetableDrawer.style.height = contentHeight + 'px';
 
                     // transitionend イベントで完了を検知
                     const handleTransitionEnd = () => {
@@ -252,7 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     // 閉じる処理
                     isTransitioning = true;
-                    timetableDrawer.style.height = timetableDrawer.scrollHeight + 'px';
+                    const contentHeight = timetableDrawer.firstElementChild.scrollHeight;
+                    timetableDrawer.style.height = contentHeight + 'px';
                     timetableDrawer.offsetHeight; // リフロー強制
                     timetableDrawer.classList.remove('is-open');
                     timetableDrawer.style.height = '0px';
@@ -273,7 +276,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 if (timetableDrawer.classList.contains('is-open') && !isTransitioning) {
-                    timetableDrawer.style.height = timetableDrawer.scrollHeight + 'px';
+                    const contentHeight = timetableDrawer.firstElementChild.scrollHeight;
+                    timetableDrawer.style.height = contentHeight + 'px';
                 }
             });
             resizeObserver.observe(timetableDrawer.firstElementChild);
