@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>簿記 - 仕訳の基本</title>
+    <!-- 注意: Tailwind CDNは開発用です。本番環境では PostCSS でビルドして最適化したCSSを使用してください。 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
@@ -347,8 +348,8 @@
             color: #94a3b8;
             margin-bottom: 4px;
         }
-    </style >
-</head >
+    </style>
+</head>
     <body class="font-sans p-4 md:p-8">
         <div class="max-w-4xl mx-auto">
             <a href="../../index.html" class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium mb-6 transition-colors">
@@ -697,6 +698,13 @@
             localStorage.setItem('lesson_submissions', JSON.stringify(history.slice(0, 10))); // 直近10件
         }
 
+            function escapeHtml(str) {
+                if (str == null) return '';
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
             function loadSubmissionHistory() {
             const container = document.getElementById('submissionHistory');
             if (!container) return;
@@ -709,10 +717,10 @@
 
             container.innerHTML = history.map(item =>
             '<div class="history-card">' +
-                '<div class="history-date">' + item.timestamp + '</div>' +
-                '<div class="font-bold text-indigo-600 mb-1">' + item.lesson + '</div>' +
-                '<div class="text-slate-700 whitespace-pre-wrap"><span class="font-bold">まとめ:</span> ' + item.summary + '</div>' +
-                (item.questions ? '<div class="text-slate-600 mt-2 text-sm italic"><span class="font-bold">？:</span> ' + item.questions + '</div>' : '') +
+                '<div class="history-date">' + escapeHtml(item.timestamp) + '</div>' +
+                '<div class="font-bold text-indigo-600 mb-1">' + escapeHtml(item.lesson) + '</div>' +
+                '<div class="text-slate-700 whitespace-pre-wrap"><span class="font-bold">まとめ:</span> ' + escapeHtml(item.summary) + '</div>' +
+                (item.questions ? '<div class="text-slate-600 mt-2 text-sm italic"><span class="font-bold">？:</span> ' + escapeHtml(item.questions) + '</div>' : '') +
                 '</div>'
             ).join('');
         }
