@@ -1047,9 +1047,9 @@ function main() {
                 date: formattedDate,
                 unit: frontmatter.unit,
                 title: `${frontmatter.subject}（${periodText}）`,
-                summary: `${frontmatter.unit}について学習しました。`,
-                tags: [frontmatter.subject, periodText],
-                readTime: '10分',
+                summary: frontmatter.summary || `${frontmatter.unit}について学習しました。`,
+                tags: frontmatter.tags || [frontmatter.subject, periodText],
+                readTime: frontmatter.readTime || '10分',
                 url: `note/${filename}/index.html`
             });
 

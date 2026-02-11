@@ -385,9 +385,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchData() {
         try {
+            const cacheBuster = `?t=${Date.now()}`;
             const [lessonsRes, toolsRes] = await Promise.all([
-                fetch(CONFIG.dataPaths.lessons),
-                fetch(CONFIG.dataPaths.tools)
+                fetch(CONFIG.dataPaths.lessons + cacheBuster),
+                fetch(CONFIG.dataPaths.tools + cacheBuster)
             ]);
             state.allLessons = await lessonsRes.json();
             state.allTools = await toolsRes.json();
