@@ -373,32 +373,41 @@
             <div class="prose prose-slate max-w-none">
                 
 <div class="tab-container">
-    <div class="tab-nav"><button class="tab-button" data-tab="schedule" onclick="switchTab('schedule')">📅 本日の内容</button><button class="tab-button" data-tab="summary-quizzes" onclick="switchTab('summary-quizzes')">📋 まとめクイズ</button><button class="tab-button" data-tab="reaction-sheet" onclick="switchTab('reaction-sheet')">📝 リアクションシート</button></div>
-    <div id="schedule" class="tab-content ">
+    <div class="tab-nav"><button class="tab-button" data-tab="review-quizzes" onclick="switchTab('review-quizzes')">📝 復習クイズ</button><button class="tab-button" data-tab="schedule" onclick="switchTab('schedule')">📅 本日の内容</button><button class="tab-button" data-tab="summary-quizzes" onclick="switchTab('summary-quizzes')">📋 まとめクイズ</button><button class="tab-button" data-tab="reaction-sheet" onclick="switchTab('reaction-sheet')">📝 リアクションシート</button></div>
+    <div id="review-quizzes" class="tab-content tab-quiz-content">
+                <div class="quiz-carousel" data-carousel="review">
+                    <div class="carousel-container"><div class="carousel-item active"><div class="quiz-question section-card" data-quiz-id="quiz-0"><p class="question-text text-lg font-semibold mb-4"><strong>Q1</strong>: 貸借対照表（B/S）の左側（借方）に来るのは次のうちどれですか？</p><div class="quiz-options"><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-0', this)"><span class="option-letter">A</span><span class="option-text">負債</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-0', this)"><span class="option-letter">B</span><span class="option-text">収益</span></div><div class="quiz-option" data-correct="true" onclick="checkAnswerImmediately('quiz-0', this)"><span class="option-letter">C</span><span class="option-text">資産</span></div></div><div class="quiz-feedback"></div></div></div><div class="carousel-item "><div class="quiz-question section-card" data-quiz-id="quiz-1"><p class="question-text text-lg font-semibold mb-4"><strong>Q2</strong>: 商品を売って得た利益などは、どのグループに分類されますか？</p><div class="quiz-options"><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-1', this)"><span class="option-letter">A</span><span class="option-text">費用</span></div><div class="quiz-option" data-correct="true" onclick="checkAnswerImmediately('quiz-1', this)"><span class="option-letter">B</span><span class="option-text">収益</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-1', this)"><span class="option-letter">C</span><span class="option-text">負債</span></div></div><div class="quiz-feedback"></div></div></div></div>
+                    
+                    <div class="carousel-nav">
+                        <button class="carousel-btn prev" onclick="navigateCarousel('review', -1)"><span class="material-symbols-outlined">chevron_left</span></button>
+                        <span class="carousel-indicator"><span class="current-slide">1</span> / 2</span>
+                        <button class="carousel-btn next" onclick="navigateCarousel('review', 1)"><span class="material-symbols-outlined">chevron_right</span></button>
+                    </div>
+                </div></div><div id="schedule" class="tab-content ">
+                <div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">history</span>前回のおさらい</h3><div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100"><p><strong>あらすじ</strong>: 前回は貸借対照表（B/S）と損益計算書（P/L）の基本について学び、資産・負債・純資産・収益・費用の5つのグループに分類することを学習しました。</p></div></div>
                 
-                <div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">event_note</span>今日の予定</h3><h3>商品以外の売買は科目名が変わる</h3>
-<p>商品の代金を後払いにするときは「売掛金」「買掛金」を使いましたが、**土地や備品、建物など「商品以外」**のときは、別の科目を使います。</p>
-<ul>
-<li><strong>未収入金（みしゅうにゅうきん）</strong>：商品以外のものを売り、あとで代金を受け取る権利（資産）</li>
-<li><strong>未払金（みばらいきん）</strong>：商品以外のものを買い、あとで代金を支払う義務（負債）</li>
-</ul>
-<h3>なぜ科目を分けるのか？</h3>
-<p>企業にとって「商品」の取引は利益を生むための最重要項目です。そのため、通常の営業サイクルである商品の取引（売掛・買掛）と、それ以外の臨時的な取引（未収・未払）を明確に区別して管理します。</p>
-<h3>仕訳（しわけ）のパターン</h3>
-<ul>
-<li><strong>① 商品以外のもの（例：土地）を売却したとき</strong>
-(借) 未収入金 / (貸) 土地</li>
-<li><strong>② 後日、その代金を受け取ったとき</strong>
-(借) 現金 / (貸) 未収入金</li>
-<li><strong>③ 商品以外のもの（例：備品）を購入したとき</strong>
-(借) 土地 / (貸) 未払金</li>
-<li><strong>④ 後日、その代金を支払ったとき</strong>
-(借) 未払金 / (貸) 現金</li>
-</ul></div>
+                <div class="mb-4"><div class="section-card">
+                <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-indigo-600">folder_open</span>
+                    資料
+                </h2>
                 
+                    <div class="mb-4">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-indigo-600">picture_as_pdf</span>
+                                <span class="font-semibold">本日のスライド（PDF）</span>
+                            </div>
+                            <span class="material-symbols-outlined accordion-icon text-slate-400">expand_more</span>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="p-4 bg-white rounded-lg">
+                                <iframe src="https://docs.google.com/viewer?url=https%3A%2F%2Fexample.com%2Fmaterial-02-11.pdf&embedded=true" class="pdf-viewer"></iframe>
+                            </div>
+                        </div></div>
             </div><div id="summary-quizzes" class="tab-content tab-quiz-content">
                 <div class="quiz-carousel" data-carousel="summary">
-                    <div class="carousel-container"><div class="carousel-item active"><div class="quiz-question section-card" data-quiz-id="quiz-0"><p class="question-text text-lg font-semibold mb-4"><strong>Q1</strong>: 古くなった備品を売却し、代金は来月受け取ることとした。この時の「代金を受け取る権利」は何という科目を使いますか？</p><div class="quiz-options"><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-0', this)"><span class="option-letter">A</span><span class="option-text">売掛金</span></div><div class="quiz-option" data-correct="true" onclick="checkAnswerImmediately('quiz-0', this)"><span class="option-letter">B</span><span class="option-text">未収入金</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-0', this)"><span class="option-letter">C</span><span class="option-text">未払金</span></div></div><div class="quiz-feedback"></div></div></div><div class="carousel-item "><div class="quiz-question section-card" data-quiz-id="quiz-1"><p class="question-text text-lg font-semibold mb-4"><strong>Q2</strong>: 事務用のパソコン（備品）を購入し、代金は後日支払うこととした。この時の負債の科目は？</p><div class="quiz-options"><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-1', this)"><span class="option-letter">A</span><span class="option-text">買掛金</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-1', this)"><span class="option-letter">B</span><span class="option-text">未収入金</span></div><div class="quiz-option" data-correct="true" onclick="checkAnswerImmediately('quiz-1', this)"><span class="option-letter">C</span><span class="option-text">未払金</span></div></div><div class="quiz-feedback"></div></div></div><div class="carousel-item "><div class="quiz-question section-card" data-quiz-id="quiz-2"><p class="question-text text-lg font-semibold mb-4"><strong>Q3</strong>: 「未収入金」をあとで回収し、現金を受け取った時の仕訳、借方は「現金」ですが、貸方は？</p><div class="quiz-options"><div class="quiz-option" data-correct="true" onclick="checkAnswerImmediately('quiz-2', this)"><span class="option-letter">A</span><span class="option-text">未収入金</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-2', this)"><span class="option-letter">B</span><span class="option-text">売掛金</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-2', this)"><span class="option-letter">C</span><span class="option-text">備品</span></div></div><div class="quiz-feedback"></div></div></div></div>
+                    <div class="carousel-container"><div class="carousel-item active"><div class="quiz-question section-card" data-quiz-id="quiz-2"><p class="question-text text-lg font-semibold mb-4"><strong>Q1</strong>: 古くなった備品を売却し、代金は来月受け取ることとした。この時の「代金を受け取る権利」は何という科目を使いますか？</p><div class="quiz-options"><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-2', this)"><span class="option-letter">A</span><span class="option-text">売掛金</span></div><div class="quiz-option" data-correct="true" onclick="checkAnswerImmediately('quiz-2', this)"><span class="option-letter">B</span><span class="option-text">未収入金</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-2', this)"><span class="option-letter">C</span><span class="option-text">未払金</span></div></div><div class="quiz-feedback"></div></div></div><div class="carousel-item "><div class="quiz-question section-card" data-quiz-id="quiz-3"><p class="question-text text-lg font-semibold mb-4"><strong>Q2</strong>: 事務用のパソコン（備品）を購入し、代金は後日支払うこととした。この時の負債の科目は？</p><div class="quiz-options"><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-3', this)"><span class="option-letter">A</span><span class="option-text">買掛金</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-3', this)"><span class="option-letter">B</span><span class="option-text">未収入金</span></div><div class="quiz-option" data-correct="true" onclick="checkAnswerImmediately('quiz-3', this)"><span class="option-letter">C</span><span class="option-text">未払金</span></div></div><div class="quiz-feedback"></div></div></div><div class="carousel-item "><div class="quiz-question section-card" data-quiz-id="quiz-4"><p class="question-text text-lg font-semibold mb-4"><strong>Q3</strong>: 「未収入金」をあとで回収し、現金を受け取った時の仕訳、借方は「現金」ですが、貸方は？</p><div class="quiz-options"><div class="quiz-option" data-correct="true" onclick="checkAnswerImmediately('quiz-4', this)"><span class="option-letter">A</span><span class="option-text">未収入金</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-4', this)"><span class="option-letter">B</span><span class="option-text">売掛金</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-4', this)"><span class="option-letter">C</span><span class="option-text">備品</span></div></div><div class="quiz-feedback"></div></div></div></div>
                     
                     <div class="carousel-nav">
                         <button class="carousel-btn prev" onclick="navigateCarousel('summary', -1)"><span class="material-symbols-outlined">chevron_left</span></button>
@@ -458,7 +467,19 @@
             </div>
         </div>
 </div>
-
+</div>
+                
+                    <div class="mb-4">
+                        <a href="https://example.com/practice-02-11" target="_blank" class="accordion-header block hover:no-underline">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-indigo-600">link</span>
+                                <span class="font-semibold">練習問題集</span>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-400">open_in_new</span>
+                        </a>
+                    </div>
+                
+            </div>
             </div>
         </div>
 
