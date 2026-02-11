@@ -44,24 +44,51 @@ export const Templates = {
     historyCard(item, lessonUrl = '#') {
         const displayDate = item.timestamp.split(' ')[0]; // yyyy-mm-ddのみ
         return `
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all hover:bg-white group">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[10px] font-bold text-slate-400 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">schedule</span> ${displayDate}
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all hover:border-primary/30 group">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-sm">calendar_today</span> ${displayDate}
                     </span>
-                    <a href="${this.escapeHtml(lessonUrl)}" class="text-[10px] font-bold text-primary hover:underline flex items-center gap-0.5">
-                        授業ページ <span class="material-symbols-outlined text-[10px]">open_in_new</span>
+                    <a href="${this.escapeHtml(lessonUrl)}" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 bg-primary/5 px-2 py-1 rounded">
+                        授業ページを開く <span class="material-symbols-outlined text-sm">open_in_new</span>
                     </a>
                 </div>
-                <h4 class="text-slate-800 font-bold mb-2 text-sm leading-snug">
-                    <a href="${this.escapeHtml(lessonUrl)}" class="hover:text-primary transition-colors">
+                
+                <h4 class="text-slate-800 font-black mb-4 text-base leading-snug group-hover:text-primary transition-colors">
+                    <a href="${this.escapeHtml(lessonUrl)}">
                         ${this.escapeHtml(item.lesson)}
                     </a>
                 </h4>
-                <div class="space-y-2">
-                    <div class="text-slate-600 text-xs line-clamp-2 italic">
-                        "${this.escapeHtml(item.summary)}"
+
+                <div class="space-y-4">
+                    <div class="bg-slate-50 rounded-lg p-3">
+                        <div class="flex items-center gap-2 mb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                            <span class="material-symbols-outlined text-xs">edit_note</span> 今日のまとめ・感想
+                        </div>
+                        <div class="text-slate-600 text-sm leading-relaxed italic">
+                            ${this.escapeHtml(item.summary || '未入力')}
+                        </div>
                     </div>
+
+                    ${item.questions && item.questions.trim() ? `
+                    <div class="bg-rose-50/50 border border-rose-100 rounded-lg p-3">
+                        <div class="flex items-center gap-2 mb-1.5 text-[10px] font-bold text-rose-400 uppercase tracking-wider">
+                            <span class="material-symbols-outlined text-xs">help_outline</span> わからなかったところ
+                        </div>
+                        <div class="text-slate-700 text-sm leading-relaxed font-bold">
+                            ${this.escapeHtml(item.questions)}
+                        </div>
+                    </div>
+                    ` : `
+                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-lg p-3">
+                        <div class="flex items-center gap-2 mb-1.5 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+                            <span class="material-symbols-outlined text-xs">check_circle</span> わからなかったところ
+                        </div>
+                        <div class="text-emerald-700/60 text-xs italic">
+                            すべて理解できました！
+                        </div>
+                    </div>
+                    `}
                 </div>
             </div>
         `;

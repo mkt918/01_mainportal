@@ -283,7 +283,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const filtered = allHistory.filter(item => {
             const month = item.timestamp.split(' ')[0].substring(0, 7);
             const matchesMonth = activeMonth === 'all' || month === activeMonth;
-            const matchesSearch = item.lesson.toLowerCase().includes(searchQuery) || item.summary.toLowerCase().includes(searchQuery);
+            const matchesSearch = item.lesson.toLowerCase().includes(searchQuery) ||
+                item.summary.toLowerCase().includes(searchQuery) ||
+                (item.questions && item.questions.toLowerCase().includes(searchQuery));
             return matchesMonth && matchesSearch;
         });
 
