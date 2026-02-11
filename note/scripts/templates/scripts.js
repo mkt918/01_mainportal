@@ -232,3 +232,10 @@ function toggleAccordion(element) {
         content.classList.add('open');
     }
 }
+
+/**
+ * PDFなどを別タブ（全画面）で開く
+ */
+function openFullscreen(url) {
+    window.open(url, '_blank');
+}

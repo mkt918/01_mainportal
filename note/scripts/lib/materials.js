@@ -34,6 +34,11 @@ function convertMaterialsToAccordion(htmlContent) {
                         </div>
                         <div class="accordion-content">
                             <div class="p-4 bg-white rounded-lg">
+                                <div class="flex justify-end mb-2">
+                                    <button onclick="openFullscreen('${embedUrl}')" class="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors bg-indigo-50 px-3 py-1.5 rounded-lg">
+                                        <span class="material-symbols-outlined text-sm">open_in_new</span> 全画面で開く
+                                    </button>
+                                </div>
                                 <iframe src="${embedUrl}" class="pdf-viewer"></iframe>
                             </div>
                         </div>

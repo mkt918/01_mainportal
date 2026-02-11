@@ -428,6 +428,11 @@ form textarea {
                         </div>
                         <div class="accordion-content">
                             <div class="p-4 bg-white rounded-lg">
+                                <div class="flex justify-end mb-2">
+                                    <button onclick="openFullscreen('./slides/2024-02-05-bookkeeping.pdf')" class="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors bg-indigo-50 px-3 py-1.5 rounded-lg">
+                                        <span class="material-symbols-outlined text-sm">open_in_new</span> 全画面で開く
+                                    </button>
+                                </div>
                                 <iframe src="./slides/2024-02-05-bookkeeping.pdf" class="pdf-viewer"></iframe>
                             </div>
                         </div>
@@ -443,6 +448,11 @@ form textarea {
                         </div>
                         <div class="accordion-content">
                             <div class="p-4 bg-white rounded-lg">
+                                <div class="flex justify-end mb-2">
+                                    <button onclick="openFullscreen('./materials/practice.pdf')" class="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors bg-indigo-50 px-3 py-1.5 rounded-lg">
+                                        <span class="material-symbols-outlined text-sm">open_in_new</span> 全画面で開く
+                                    </button>
+                                </div>
                                 <iframe src="./materials/practice.pdf" class="pdf-viewer"></iframe>
                             </div>
                         </div>
@@ -748,6 +758,13 @@ function toggleAccordion(element) {
         element.classList.add('active');
         content.classList.add('open');
     }
+}
+
+/**
+ * PDFなどを別タブ（全画面）で開く
+ */
+function openFullscreen(url) {
+    window.open(url, '_blank');
 }
 
     </script>
