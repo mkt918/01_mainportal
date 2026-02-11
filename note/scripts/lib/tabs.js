@@ -126,7 +126,8 @@ function buildScheduleContent(reviewContentText, scheduleContentText, materialsC
     }
 
     if (scheduleContentText) {
-        content += `<div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">event_note</span>今日の予定</h3>${scheduleContentText}</div>`;
+        const styledSchedule = styleScheduleContent(scheduleContentText);
+        content += `<div class="schedule-content">${styledSchedule}</div>`;
     }
 
     if (materialsContentText) {
@@ -134,6 +135,41 @@ function buildScheduleContent(reviewContentText, scheduleContentText, materialsC
     }
 
     return content;
+}
+
+/**
+ * 本日の内容のHTMLにスタイルを適用
+ */
+function styleScheduleContent(html) {
+    let result = html
+        // h3をカード形式の見出しに変換
+        .replace(/<h3>([^<]+)<\/h3>/g, `
+            <div class="schedule-section mb-6">
+                <h3 class="text-lg font-bold mb-3 pb-2 border-b-2 border-indigo-200 text-indigo-700 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-indigo-500">chevron_right</span>
+                    $1
+                </h3>
+            </div>`)
+        // 箇条書きリストをカードスタイルに
+        .replace(/<ul>/g, '<ul class="space-y-3 mb-6">')
+        // strong付き箇条書き（li全体を置換）
+        .replace(/<li><strong>([^<]+)<\/strong>([\s\S]*?)<\/li>/g,
+            `<li class="flex items-start gap-3 p-4 bg-gradient-to-r from-slate-50 to-white rounded-xl border border-slate-100 shadow-sm">
+                <span class="material-symbols-outlined text-indigo-500 mt-0.5 flex-shrink-0">label_important</span>
+                <div><span class="font-bold text-indigo-700">$1</span><span class="text-slate-600">$2</span></div>
+            </li>`)
+        // 段落にクラスを追加
+        .replace(/<p>/g, '<p class="text-slate-700 leading-relaxed mb-4">');
+
+    // 閉じていないschedule-sectionを閉じる
+    result = result.replace(/(<div class="schedule-section mb-6">[\s\S]*?)(?=<div class="schedule-section mb-6">|$)/g, (match) => {
+        if (!match.includes('</div>\n            </div>')) {
+            return match.replace(/<\/h3>\s*<\/div>/, '</h3>') + '</div>';
+        }
+        return match;
+    });
+
+    return result;
 }
 
 /**

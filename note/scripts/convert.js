@@ -3,7 +3,7 @@ const path = require('path');
 const { marked } = require('marked');
 
 const { LESSONS_DIR, OUTPUT_DIR, LESSONS_JSON } = require('./lib/config');
-const { formatDate, formatPeriod } = require('./lib/utils');
+const { formatDate, formatPeriod, fixUnconvertedMarkdown } = require('./lib/utils');
 const { parseMarkdownFile } = require('./lib/parser');
 const { convertQuizToHTML } = require('./lib/quiz');
 const { convertToTabStructure } = require('./lib/tabs');
@@ -32,6 +32,9 @@ function main() {
 
             // MarkdownをHTMLに変換
             let htmlContent = marked(quizHTML);
+
+            // markedが変換できなかった**を補完
+            htmlContent = fixUnconvertedMarkdown(htmlContent);
 
             // タブ形式に変換
             htmlContent = convertToTabStructure(htmlContent);

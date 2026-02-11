@@ -346,6 +346,34 @@ form textarea {
     margin-bottom: 4px;
 }
 
+/* 本日の内容セクション */
+.schedule-content {
+    padding: 8px 0;
+}
+
+.schedule-content .schedule-section {
+    margin-bottom: 24px;
+}
+
+.schedule-content .schedule-section:last-child {
+    margin-bottom: 0;
+}
+
+.schedule-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.schedule-content li {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.schedule-content li:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
     </style>
 </head>
 <body class="font-sans p-4 md:p-8">
@@ -379,7 +407,7 @@ form textarea {
                         <span class="carousel-indicator"><span class="current-slide">1</span> / 2</span>
                         <button class="carousel-btn next" onclick="navigateCarousel('review', 1)"><span class="material-symbols-outlined">chevron_right</span></button>
                     </div>
-                </div></div><div id="schedule" class="tab-content "><div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">history</span>前回のおさらい</h3><div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100"><p><strong>あらすじ</strong>: 簿記の5要素（資産・負債・純資産・収益・費用）について学びました</p></div></div><div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">event_note</span>今日の予定</h3><ol>
+                </div></div><div id="schedule" class="tab-content "><div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">history</span>前回のおさらい</h3><div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100"><p><strong>あらすじ</strong>: 簿記の5要素（資産・負債・純資産・収益・費用）について学びました</p></div></div><div class="schedule-content"><ol>
 <li>仕訳帳の記入方法を学ぶ</li>
 <li>実際の取引例で練習する</li>
 <li>総勘定元帳への転記を理解する</li>
@@ -400,7 +428,7 @@ form textarea {
                         </div>
                         <div class="accordion-content">
                             <div class="p-4 bg-white rounded-lg">
-                                <iframe src="https://docs.google.com/viewer?url=.%2Fslides%2F2024-02-05-bookkeeping.pdf&embedded=true" class="pdf-viewer"></iframe>
+                                <iframe src="./slides/2024-02-05-bookkeeping.pdf" class="pdf-viewer"></iframe>
                             </div>
                         </div>
                     </div>
@@ -415,7 +443,7 @@ form textarea {
                         </div>
                         <div class="accordion-content">
                             <div class="p-4 bg-white rounded-lg">
-                                <iframe src="https://docs.google.com/viewer?url=.%2Fmaterials%2Fpractice.pdf&embedded=true" class="pdf-viewer"></iframe>
+                                <iframe src="./materials/practice.pdf" class="pdf-viewer"></iframe>
                             </div>
                         </div>
                     </div>

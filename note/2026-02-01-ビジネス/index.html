@@ -346,6 +346,34 @@ form textarea {
     margin-bottom: 4px;
 }
 
+/* 本日の内容セクション */
+.schedule-content {
+    padding: 8px 0;
+}
+
+.schedule-content .schedule-section {
+    margin-bottom: 24px;
+}
+
+.schedule-content .schedule-section:last-child {
+    margin-bottom: 0;
+}
+
+.schedule-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.schedule-content li {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.schedule-content li:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
     </style>
 </head>
 <body class="font-sans p-4 md:p-8">
@@ -374,16 +402,21 @@ form textarea {
                 <div class="quiz-carousel" data-carousel="review">
                     <div class="carousel-container"><div class="carousel-item active"><div class="quiz-question section-card" data-quiz-id="quiz-0"><p class="question-text text-lg font-semibold mb-4"><strong>Q1</strong>: ビジネスの目的として最も適切なものはどれですか？</p><div class="quiz-options"><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-0', this)"><span class="option-letter">A</span><span class="option-text">自分の利益だけを追求すること</span></div><div class="quiz-option" data-correct="true" onclick="checkAnswerImmediately('quiz-0', this)"><span class="option-letter">B</span><span class="option-text">顧客の不満を解決し、対価を得ること</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-0', this)"><span class="option-letter">C</span><span class="option-text">社会貢献のみを行い、利益を度外視すること</span></div></div><div class="quiz-feedback"></div></div></div></div>
                     
-                </div></div><div id="schedule" class="tab-content "><div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">history</span>前回のおさらい</h3><div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100"><p><strong>あらすじ</strong>: 前回は「ビジネス」の定義と、私たちの生活との関わりについて学びました。</p></div></div><div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">event_note</span>今日の予定</h3><ol>
+                </div></div><div id="schedule" class="tab-content "><div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">history</span>前回のおさらい</h3><div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100"><p><strong>あらすじ</strong>: 前回は「ビジネス」の定義と、私たちの生活との関わりについて学びました。</p></div></div><div class="schedule-content"><ol>
 <li>経済主体の3つの役割（家計・企業・政府）</li>
 <li>企業の社会的責任（CSR）</li>
 <li>株式会社の仕組み</li>
 </ol>
-<h3>資料</h3>
-<ul>
+
+            <div class="schedule-section mb-6">
+                <h3 class="text-lg font-bold mb-3 pb-2 border-b-2 border-indigo-200 text-indigo-700 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-indigo-500">chevron_right</span>
+                    資料
+                </h3>
+<ul class="space-y-3 mb-6">
 <li><a href="https://example.com/business-economics-slides">経済の仕組みスライド</a></li>
 <li><a href="https://example.com/csr_sample.pdf">CSR報告書サンプルPDF</a></li>
-</ul></div></div><div id="summary-quizzes" class="tab-content tab-quiz-content">
+</ul></div></div></div><div id="summary-quizzes" class="tab-content tab-quiz-content">
                 <div class="quiz-carousel" data-carousel="summary">
                     <div class="carousel-container"><div class="carousel-item active"><div class="quiz-question section-card" data-quiz-id="quiz-1"><p class="question-text text-lg font-semibold mb-4"><strong>Q1</strong>: 「家計・企業・政府」の3つをまとめて、何と呼びますか？</p><div class="quiz-options"><div class="quiz-option" data-correct="true" onclick="checkAnswerImmediately('quiz-1', this)"><span class="option-letter">A</span><span class="option-text">経済主体</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-1', this)"><span class="option-letter">B</span><span class="option-text">金融機関</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-1', this)"><span class="option-letter">C</span><span class="option-text">公共団体</span></div></div><div class="quiz-feedback"></div></div></div><div class="carousel-item "><div class="quiz-question section-card" data-quiz-id="quiz-2"><p class="question-text text-lg font-semibold mb-4"><strong>Q2</strong>: 企業が社会に対して負う責任のことを、英字3文字で何と呼びますか？</p><div class="quiz-options"><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-2', this)"><span class="option-letter">A</span><span class="option-text">CEO</span></div><div class="quiz-option" data-correct="true" onclick="checkAnswerImmediately('quiz-2', this)"><span class="option-letter">B</span><span class="option-text">CSR</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-2', this)"><span class="option-letter">C</span><span class="option-text">CS</span></div></div><div class="quiz-feedback"></div></div></div><div class="carousel-item "><div class="quiz-question section-card" data-quiz-id="quiz-3"><p class="question-text text-lg font-semibold mb-4"><strong>Q3</strong>: 株式会社の所有者は誰ですか？</p><div class="quiz-options"><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-3', this)"><span class="option-letter">A</span><span class="option-text">社長</span></div><div class="quiz-option" data-correct="false" onclick="checkAnswerImmediately('quiz-3', this)"><span class="option-letter">B</span><span class="option-text">従業員</span></div><div class="quiz-option" data-correct="true" onclick="checkAnswerImmediately('quiz-3', this)"><span class="option-letter">C</span><span class="option-text">株主</span></div></div><div class="quiz-feedback"></div></div></div></div>
                     

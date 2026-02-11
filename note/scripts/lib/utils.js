@@ -28,8 +28,19 @@ function formatPeriod(period) {
     return period.toString().includes('限') ? period : `${period}限`;
 }
 
+/**
+ * markedが変換できなかった**を<strong>に変換
+ * 日本語テキストでmarkedが失敗するケースの補完
+ */
+function fixUnconvertedMarkdown(html) {
+    return html
+        // **text** → <strong>text</strong>
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+}
+
 module.exports = {
     formatDate,
     escapeHtml,
-    formatPeriod
+    formatPeriod,
+    fixUnconvertedMarkdown
 };

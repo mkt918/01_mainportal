@@ -15,9 +15,13 @@ function convertMaterialsToAccordion(htmlContent) {
             const isPDF = url.toLowerCase().endsWith('.pdf') || url.includes('drive.google.com');
 
             if (isPDF) {
+                // ローカルファイル（相対パス）はそのまま、外部URLはビューアー経由
+                const isLocal = url.startsWith('./') || url.startsWith('../') || !url.startsWith('http');
                 const embedUrl = url.includes('drive.google.com')
                     ? url.replace('/view', '/preview')
-                    : `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+                    : isLocal
+                        ? url
+                        : `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
 
                 materials.push(`
                     <div class="mb-4">

@@ -336,3 +336,31 @@ form textarea {
     color: #94a3b8;
     margin-bottom: 4px;
 }
+
+/* 本日の内容セクション */
+.schedule-content {
+    padding: 8px 0;
+}
+
+.schedule-content .schedule-section {
+    margin-bottom: 24px;
+}
+
+.schedule-content .schedule-section:last-child {
+    margin-bottom: 0;
+}
+
+.schedule-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.schedule-content li {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.schedule-content li:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}

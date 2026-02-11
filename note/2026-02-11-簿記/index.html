@@ -346,6 +346,34 @@ form textarea {
     margin-bottom: 4px;
 }
 
+/* 本日の内容セクション */
+.schedule-content {
+    padding: 8px 0;
+}
+
+.schedule-content .schedule-section {
+    margin-bottom: 24px;
+}
+
+.schedule-content .schedule-section:last-child {
+    margin-bottom: 0;
+}
+
+.schedule-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.schedule-content li {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.schedule-content li:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
     </style>
 </head>
 <body class="font-sans p-4 md:p-8">
@@ -379,25 +407,58 @@ form textarea {
                         <span class="carousel-indicator"><span class="current-slide">1</span> / 2</span>
                         <button class="carousel-btn next" onclick="navigateCarousel('review', 1)"><span class="material-symbols-outlined">chevron_right</span></button>
                     </div>
-                </div></div><div id="schedule" class="tab-content "><div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">history</span>前回のおさらい</h3><div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100"><p><strong>あらすじ</strong>: 前回は貸借対照表（B/S）と損益計算書（P/L）の基本について学び、資産・負債・純資産・収益・費用の5つのグループに分類することを学習しました。</p></div></div><div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">event_note</span>今日の予定</h3><h3>商品以外の売買は科目名が変わる</h3>
-<p>商品の代金を後払いにするときは「売掛金」「買掛金」を使いましたが、**土地や備品、建物など「商品以外」**のときは、別の科目を使います。</p>
-<ul>
-<li><strong>未収入金（みしゅうにゅうきん）</strong>：商品以外のものを売り、あとで代金を受け取る権利（資産）</li>
-<li><strong>未払金（みばらいきん）</strong>：商品以外のものを買い、あとで代金を支払う義務（負債）</li>
+                </div></div><div id="schedule" class="tab-content "><div class="mb-8"><h3 class="text-xl font-bold mb-4 text-indigo-600 flex items-center gap-2"><span class="material-symbols-outlined">history</span>前回のおさらい</h3><div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100"><p><strong>あらすじ</strong>: 前回は貸借対照表（B/S）と損益計算書（P/L）の基本について学び、資産・負債・純資産・収益・費用の5つのグループに分類することを学習しました。</p></div></div><div class="schedule-content">
+            <div class="schedule-section mb-6">
+                <h3 class="text-lg font-bold mb-3 pb-2 border-b-2 border-indigo-200 text-indigo-700 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-indigo-500">chevron_right</span>
+                    商品以外の売買は科目名が変わる
+                </h3>
+<p class="text-slate-700 leading-relaxed mb-4">商品の代金を後払いにするときは「売掛金」「買掛金」を使いましたが、<strong>土地や備品、建物など「商品以外」</strong>のときは、別の科目を使います。</p>
+<ul class="space-y-3 mb-6">
+<li class="flex items-start gap-3 p-4 bg-gradient-to-r from-slate-50 to-white rounded-xl border border-slate-100 shadow-sm">
+                <span class="material-symbols-outlined text-indigo-500 mt-0.5 flex-shrink-0">label_important</span>
+                <div><span class="font-bold text-indigo-700">未収入金（みしゅうにゅうきん）</span><span class="text-slate-600">：商品以外のものを売り、あとで代金を受け取る権利（資産）</span></div>
+            </li>
+<li class="flex items-start gap-3 p-4 bg-gradient-to-r from-slate-50 to-white rounded-xl border border-slate-100 shadow-sm">
+                <span class="material-symbols-outlined text-indigo-500 mt-0.5 flex-shrink-0">label_important</span>
+                <div><span class="font-bold text-indigo-700">未払金（みばらいきん）</span><span class="text-slate-600">：商品以外のものを買い、あとで代金を支払う義務（負債）</span></div>
+            </li>
 </ul>
-<h3>なぜ科目を分けるのか？</h3>
-<p>企業にとって「商品」の取引は利益を生むための最重要項目です。そのため、通常の営業サイクルである商品の取引（売掛・買掛）と、それ以外の臨時的な取引（未収・未払）を明確に区別して管理します。</p>
-<h3>仕訳（しわけ）のパターン</h3>
-<ul>
-<li><strong>① 商品以外のもの（例：土地）を売却したとき</strong>
-(借) 未収入金 / (貸) 土地</li>
-<li><strong>② 後日、その代金を受け取ったとき</strong>
-(借) 現金 / (貸) 未収入金</li>
-<li><strong>③ 商品以外のもの（例：備品）を購入したとき</strong>
-(借) 土地 / (貸) 未払金</li>
-<li><strong>④ 後日、その代金を支払ったとき</strong>
-(借) 未払金 / (貸) 現金</li>
-</ul></div><div class="mb-4">
+
+            </div><div class="schedule-section mb-6">
+                <h3 class="text-lg font-bold mb-3 pb-2 border-b-2 border-indigo-200 text-indigo-700 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-indigo-500">chevron_right</span>
+                    なぜ科目を分けるのか？
+                </h3>
+<p class="text-slate-700 leading-relaxed mb-4">企業にとって「商品」の取引は利益を生むための最重要項目です。そのため、通常の営業サイクルである商品の取引（売掛・買掛）と、それ以外の臨時的な取引（未収・未払）を明確に区別して管理します。</p>
+
+            </div><div class="schedule-section mb-6">
+                <h3 class="text-lg font-bold mb-3 pb-2 border-b-2 border-indigo-200 text-indigo-700 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-indigo-500">chevron_right</span>
+                    仕訳（しわけ）のパターン
+                </h3>
+<ul class="space-y-3 mb-6">
+<li class="flex items-start gap-3 p-4 bg-gradient-to-r from-slate-50 to-white rounded-xl border border-slate-100 shadow-sm">
+                <span class="material-symbols-outlined text-indigo-500 mt-0.5 flex-shrink-0">label_important</span>
+                <div><span class="font-bold text-indigo-700">① 商品以外のもの（例：土地）を売却したとき</span><span class="text-slate-600">
+(借) 未収入金 / (貸) 土地</span></div>
+            </li>
+<li class="flex items-start gap-3 p-4 bg-gradient-to-r from-slate-50 to-white rounded-xl border border-slate-100 shadow-sm">
+                <span class="material-symbols-outlined text-indigo-500 mt-0.5 flex-shrink-0">label_important</span>
+                <div><span class="font-bold text-indigo-700">② 後日、その代金を受け取ったとき</span><span class="text-slate-600">
+(借) 現金 / (貸) 未収入金</span></div>
+            </li>
+<li class="flex items-start gap-3 p-4 bg-gradient-to-r from-slate-50 to-white rounded-xl border border-slate-100 shadow-sm">
+                <span class="material-symbols-outlined text-indigo-500 mt-0.5 flex-shrink-0">label_important</span>
+                <div><span class="font-bold text-indigo-700">③ 商品以外のもの（例：備品）を購入したとき</span><span class="text-slate-600">
+(借) 土地 / (貸) 未払金</span></div>
+            </li>
+<li class="flex items-start gap-3 p-4 bg-gradient-to-r from-slate-50 to-white rounded-xl border border-slate-100 shadow-sm">
+                <span class="material-symbols-outlined text-indigo-500 mt-0.5 flex-shrink-0">label_important</span>
+                <div><span class="font-bold text-indigo-700">④ 後日、その代金を支払ったとき</span><span class="text-slate-600">
+(借) 未払金 / (貸) 現金</span></div>
+            </li>
+</ul></div></div><div class="mb-4">
             <div class="section-card">
                 <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
                     <span class="material-symbols-outlined text-indigo-600">folder_open</span>
@@ -414,7 +475,7 @@ form textarea {
                         </div>
                         <div class="accordion-content">
                             <div class="p-4 bg-white rounded-lg">
-                                <iframe src="https://docs.google.com/viewer?url=https%3A%2F%2Fexample.com%2Fmaterial-02-11.pdf&embedded=true" class="pdf-viewer"></iframe>
+                                <iframe src="./Other_Receivables_Other_Payables_Explained.pdf" class="pdf-viewer"></iframe>
                             </div>
                         </div>
                     </div>

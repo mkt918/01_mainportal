@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(tree:*)",
-      "Bash(node convert.js:*)"
+      "Bash(node convert.js:*)",
+      "Bash(node -e:*)"
     ]
   }
 }
