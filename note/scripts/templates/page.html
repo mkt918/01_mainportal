@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{SUBJECT}} - {{UNIT}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+{{STYLES}}
+    </style>
+</head>
+<body class="font-sans p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <a href="../../index.html" class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium mb-6 transition-colors">
+            <span class="material-symbols-outlined text-xl">arrow_back</span>
+            ポータルに戻る
+        </a>
+
+        <div class="section-card mb-8">
+            <div class="flex items-center gap-3 text-slate-500 text-sm mb-3">
+                <span class="material-symbols-outlined text-lg">calendar_month</span>
+                <span>{{DATE}}</span>
+                <span class="mx-1">|</span>
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">{{PERIOD}}</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">{{SUBJECT}}</h1>
+            <p class="text-xl text-slate-600">{{UNIT}}</p>
+        </div>
+
+        <div class="prose prose-slate max-w-none">
+{{CONTENT}}
+        </div>
+    </div>
+
+    <script>
+{{SCRIPTS}}
+    </script>
+</body>
+</html>
