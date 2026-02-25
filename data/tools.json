@@ -1,8 +1,20 @@
 [
     {
         "id": 1,
-        "name": "QuizMillion",
-        "description": "IT知識を楽しく学べるクイズアプリです。授業の復習に活用してください。",
+        "name": "全商検定タイピング",
+        "description": "全商情報処理検定のタイピング練習ツールです。",
+        "tags": [
+            "タイピング",
+            "検定対策"
+        ],
+        "icon": "keyboard",
+        "url": "https://mkt918.github.io/typing03/",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAgHIEQ7B41dtmruWPxHXOnva2G8vE_iPne28mauGH_UPtmGb3-vzO9-satT5ClL3EVkyPgOvAfGZrkfZvsyxQ0V8gSu7-Q2PbSpRncjjrE-GgAcO0pwaIYq7EKgjW2Urrdq3GhVeotYtC09BvS2tpfjE7ULQEUtIVjaUOPbkxMtym8jFsfpiPJczYmT4IpQf-ujgvmZf4fa_ASERVdAoXFS1YQpAQJcBcwSiShcNLrPJdxYb0Y2YEda-G5jiR7CaRrqlSL5psxMqQ3"
+    },
+    {
+        "id": 2,
+        "name": "情報処理用語クイズ",
+        "description": "IT知識を楽しく学べるクイズアプリです。",
         "tags": [
             "クイズ",
             "IT基礎"
@@ -12,39 +24,75 @@
         "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCTlBfwZ367rpXkc2j2LO3tF2MkwOyX-2Wcy7VPdeUUH3c2o9zC2A2Wq7Xtw0fpBbffjnodKCLhMln0n_StvuZhua8GRUW_CbgeE37OAJ6vpECzAHHmWYC2n757zyFxklO5GVFa8RlsRHvybLfguvjDfc9Hy5vOkC1D6dIGa-0Yw-AMKAf5rRZtAPmRog-R2rUmwINdMZT6YhsMdNRqT9eZ5Vkx-OUPXHaXS1FxUCfczEYUEi2T9ewcIylCAMjujqBJVYiNZiNS57xe"
     },
     {
-        "id": 2,
-        "name": "タイピング練習 (01)",
-        "description": "ブラインドタッチの習得を目指すための基礎練習ツールです。",
-        "tags": [
-            "練習",
-            "基礎"
-        ],
-        "icon": "keyboard",
-        "url": "https://mkt918.github.io/typing01/",
-        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuD7ZNrD1fr1YDvTqioSGPe_SOaSe6vHoAY2Frc6zZWckPJKFd37CiPBao1UIP9s6Fnf_7e3g2gxsiYYyLL-57C4M_7gqylfnjBqRGZ8Gvz-J-LeDUMzeFuEt-dkcaQOQ3JUodEhMrh-XMPaaBB0quokXgaxu6xxgAWwHWlGpFAzC1nB_zbobI9W_m7jBC0_saejWka2p_vCtPG6AlDWen9WSV9meAx00syi3UVZEyYhK8seHU4s4_W6KmcS9Ig06y7Sm5q-a9MxIjlM"
-    },
-    {
         "id": 3,
-        "name": "タイピング練習 (03)",
-        "description": "より高度なタイピングスキルを身につけるための応用練習ツールです。",
+        "name": "トランプでアルゴリズム",
+        "description": "トランプを使ってアルゴリズムを学ぶことができます。",
         "tags": [
-            "練習",
-            "応用"
+            "アルゴリズム",
+            "プログラミング"
         ],
-        "icon": "keyboard_command_key",
-        "url": "https://mkt918.github.io/typing03/",
-        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAgHIEQ7B41dtmruWPxHXOnva2G8vE_iPne28mauGH_UPtmGb3-vzO9-satT5ClL3EVkyPgOvAfGZrkfZvsyxQ0V8gSu7-Q2PbSpRncjjrE-GgAcO0pwaIYq7EKgjW2Urrdq3GhVeotYtC09BvS2tpfjE7ULQEUtIVjaUOPbkxMtym8jFsfpiPJczYmT4IpQf-ujgvmZf4fa_ASERVdAoXFS1YQpAQJcBcwSiShcNLrPJdxYb0Y2YEda-G5jiR7CaRrqlSL5psxMqQ3"
+        "icon": "style",
+        "url": "https://mkt918.github.io/pro_01/",
+        "image": ""
     },
     {
         "id": 4,
-        "name": "EDINETモニタ",
-        "description": "企業の財務情報を簡単に検索・閲覧できるツールです。",
+        "name": "プログラミングでお絵描き",
+        "description": "プログラミングを通じて図形を描画するツールです。",
         "tags": [
-            "リサーチ",
-            "ビジネス"
+            "プログラミング",
+            "描画"
         ],
-        "icon": "monitoring",
-        "url": "https://mkt918.github.io/edinet_monitor/",
-        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBhLTxthDhEVQLwPLguGM-KzJSwQZN6gGL4Jy-4L3R6YqEPTMNAZPL0LhBgIZXb18rIHh7l7516cXUrw2vE4m8pAmmZEu_MI2RgQ2w4AIQEFdph46a11don5NRLkZBhEwLiUrqP6VDjNHiCb8mHw0YR47cSOJi2016spK8FQka2lQuwNzmUDtClDtwwUJ_UKsmid0hhRBC7OFfPlLaTTxMDs6fYl0dL2wXnEVbTdOyUfMsTi3V4USQitEpWVEcgxflpMYmN__RrmpJL"
+        "icon": "brush",
+        "url": "https://mkt918.github.io/pro_02/",
+        "image": ""
+    },
+    {
+        "id": 5,
+        "name": "愛知県ジグソーパズル",
+        "description": "愛知県の市町村を覚えるためのジグソーパズルです。",
+        "tags": [
+            "パズル",
+            "地理"
+        ],
+        "icon": "extension",
+        "url": "https://mkt918.github.io/045_aichipazuru/",
+        "image": ""
+    },
+    {
+        "id": 6,
+        "name": "マス目プログラミング",
+        "description": "マス目を使ってプログラミングの基礎を学ぶツールです。",
+        "tags": [
+            "プログラミング",
+            "基礎"
+        ],
+        "icon": "grid_on",
+        "url": "https://mkt918.github.io/pro_04/",
+        "image": ""
+    },
+    {
+        "id": 7,
+        "name": "株式投資ゲーム",
+        "description": "シミュレーション形式で株式投資の基本を学べるゲームです。",
+        "tags": [
+            "シミュレーション",
+            "経済"
+        ],
+        "icon": "trending_up",
+        "url": "https://mkt918.github.io/stock_01/",
+        "image": ""
+    },
+    {
+        "id": 8,
+        "name": "情報処理計算問題",
+        "description": "情報処理検定の計算問題の対策ツールです。",
+        "tags": [
+            "計算",
+            "検定対策"
+        ],
+        "icon": "calculate",
+        "url": "https://mkt918.github.io/pro_05_keisan/index.html",
+        "image": ""
     }
 ]
