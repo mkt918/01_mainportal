@@ -120,14 +120,15 @@ export const ToDo = {
     },
 
     /**
-     * タスク追加（通常タスクに追加）
+     * タスク追加
      */
-    addTask(title) {
+    addTask(title, type = 'normal') {
         if (!title) return;
 
         // 上限チェック
-        if (this.state.normal.length >= this.limits.normal) {
-            alert(`通常タスクは${this.limits.normal}個までしか登録できません。内容を整理してください。`);
+        if (this.state[type].length >= this.limits[type]) {
+            const typeName = type === 'important' ? '重要' : '通常';
+            alert(`${typeName}タスクは${this.limits[type]}個までしか登録できません。内容を整理してください。`);
             return;
         }
 
@@ -137,9 +138,9 @@ export const ToDo = {
             title: title
         };
 
-        this.state.normal.push(newTask);
+        this.state[type].push(newTask);
         this.saveData();
-        this.renderList('normal');
+        this.renderList(type);
         this.updateCounts();
     },
 
@@ -210,16 +211,28 @@ export const ToDo = {
      * UIの初期化
      */
     initEventListeners() {
+        const addImpBtn = document.getElementById('todo-add-important-btn');
         const addBtn = document.getElementById('todo-add-btn');
         const inputPanel = document.getElementById('todo-input-panel');
         const saveBtn = document.getElementById('todo-save-btn');
         const cancelBtn = document.getElementById('todo-cancel-btn');
         const titleInput = document.getElementById('todo-new-title');
 
+        let currentAddType = 'normal';
+
+        if (addImpBtn) {
+            addImpBtn.addEventListener('click', () => {
+                currentAddType = 'important';
+                inputPanel.classList.remove('hidden');
+                titleInput.focus();
+            });
+        }
+
         if (addBtn) {
             addBtn.addEventListener('click', () => {
-                inputPanel.classList.toggle('hidden');
-                if (!inputPanel.classList.contains('hidden')) titleInput.focus();
+                currentAddType = 'normal';
+                inputPanel.classList.remove('hidden');
+                titleInput.focus();
             });
         }
 
@@ -233,7 +246,7 @@ export const ToDo = {
         const handleSave = () => {
             const title = titleInput.value.trim();
             if (title) {
-                this.addTask(title);
+                this.addTask(title, currentAddType);
                 titleInput.value = '';
                 inputPanel.classList.add('hidden');
             }
